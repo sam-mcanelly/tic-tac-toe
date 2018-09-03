@@ -15,30 +15,59 @@
  * is 0x3C
  * 
  ****************************************/
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <SPI.h>
-#include <Wire.h>
+#include <UTView.h>
 
-// This value can be found on 
-// the display
-#define OLED_ADDR   0x3D
-#define OLED_RESET  4
+#define IO_COUNT 5
+#define LEFT_PIN 2
+#define ENTER_PIN 3
+#define UP_PIN 4
+#define RIGHT_PIN 5
+#define DOWN_PIN 6
 
-Adafruit_SSD1306 display(OLED_RESET);
+uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN, ENTER_PIN};
 
-#if (SSD1306_LCDHEIGHT != 64)
-#error("Height incorrect, please fix Adafruit_SSD1306.h!");
-#endif
+UTView view;
+bool isRunning;
 
 void setup() {
+  //start serial for debugging purposes
   Serial.begin(9600);
 
-  display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
-  display.clearDisplay();
+  isRunning = false;
+
+  //initialize inputs
+  pinMode(LEFT_PIN, INPUT_PULLUP);
+  pinMode(ENTER_PIN, INPUT_PULLUP);
+  pinMode(UP_PIN, INPUT_PULLUP);
+  pinMode(RIGHT_PIN, INPUT_PULLUP);
+  pinMode(DOWN_PIN, INPUT_PULLUP);
+  
+  view.begin();
+  
 }
 
 void loop() {
-  
+  //check button input if the
+  //transducer is not running
+  if(!isRunning)
+  {
+    checkButtons();
+  }
 
 }
+
+void checkButtons()
+{
+  for(uint8_t i = 0; i < IO_COUNT; i++)
+  {
+    int input = digitalRead(buttonPins[i]);
+    Serial.println(input);
+    if(input == LOW)
+    {
+      delay(200); //debounce
+      view.handlePress(i);
+    }
+    
+  }
+}
+
