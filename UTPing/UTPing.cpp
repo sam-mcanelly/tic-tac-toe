@@ -1,4 +1,3 @@
-#include "WProgram.h"
 #include "UTPing.h"
 
 UTPing::Ping(int outputPin, int inputPin)
