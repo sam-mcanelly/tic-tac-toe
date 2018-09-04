@@ -27,13 +27,10 @@
 uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN, ENTER_PIN};
 
 UTView view;
-bool isRunning;
 
 void setup() {
   //start serial for debugging purposes
   Serial.begin(9600);
-
-  isRunning = false;
 
   //initialize inputs
   pinMode(LEFT_PIN, INPUT_PULLUP);
@@ -41,6 +38,8 @@ void setup() {
   pinMode(UP_PIN, INPUT_PULLUP);
   pinMode(RIGHT_PIN, INPUT_PULLUP);
   pinMode(DOWN_PIN, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(ENTER_PIN), handleInterrupt, LOW);
   
   view.begin();
   
@@ -49,11 +48,18 @@ void setup() {
 void loop() {
   //check button input if the
   //transducer is not running
-  if(!isRunning)
+  if(!view.isRunning())
   {
     checkButtons();
   }
 
+  
+
+}
+
+void handleInterrupt()
+{
+  view.handlePress(4); //enter's position in the array
 }
 
 void checkButtons()

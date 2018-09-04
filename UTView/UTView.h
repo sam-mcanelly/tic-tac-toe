@@ -7,6 +7,7 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+//#include <UTPing.h>
 
 #define OLED_RESET  4
 #define OLED_ADDR   0x3C
@@ -44,10 +45,9 @@ class UTView
     public:
         UTView();
         void begin();
+        bool isRunning();
 
-        void switchView(view newView);
         void updateGraph();
-
         void handlePress(uint8_t i);
 
     private:
@@ -58,7 +58,6 @@ class UTView
 
         String mainViewStrings[MAIN_IO_COUNT] = {"menu", "start", "pause"};
         String menuViewStrings[MENU_IO_COUNT] = {"delay", "gain", "range", "calibration"};
-
 
         //main screen input positions
         XYPos_t menuPosition = {1, 54};
@@ -79,6 +78,8 @@ class UTView
         view currentView;
 
         void showSplashScreen();
+
+        void switchView(view newView);
 
         void showMainView();
         void showMenuView();

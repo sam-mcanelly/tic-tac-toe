@@ -17,6 +17,11 @@ void UTView::begin()
 
 }
 
+bool UTView::isRunning()
+{
+    return running;
+}
+
 void UTView::showSplashScreen()
 {
     display.clearDisplay();
