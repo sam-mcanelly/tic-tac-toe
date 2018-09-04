@@ -1,7 +1,7 @@
 #ifndef UTPing_h
 #define UTPing_h
 
-#include "WProgram.h"
+#include "Arduino.h"
 
 class UTPing
 {
