@@ -24,7 +24,7 @@
 #define RIGHT_PIN 5
 #define DOWN_PIN 6
 
-uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN, ENTER_PIN};
+uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN};
 
 UTView view;
 
@@ -59,15 +59,22 @@ void loop() {
 
 void handleInterrupt()
 {
-  view.handlePress(4); //enter's position in the array
+  //de-bouncing
+  static unsigned long last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+  if (interrupt_time - last_interrupt_time > 200) 
+  {
+    Serial.println("Enter pressed!");
+    view.handlePress(4); //enter's position in the array 
+  }
+  last_interrupt_time = interrupt_time;
 }
 
 void checkButtons()
 {
-  for(uint8_t i = 0; i < IO_COUNT; i++)
+  for(uint8_t i = 0; i < IO_COUNT - 1; i++)
   {
     int input = digitalRead(buttonPins[i]);
-    Serial.println(input);
     if(input == LOW)
     {
       delay(200); //debounce

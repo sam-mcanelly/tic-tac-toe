@@ -27,6 +27,7 @@ enum view
     MAIN,
     MENU,
     CALIBRATE,
+    RANGE,
     DELAY,
     GAIN
 };
@@ -55,6 +56,7 @@ class UTView
         int inputCursorPosition;
 
         String stop = "stop";
+        String microSeconds = "μs";
 
         String mainViewStrings[MAIN_IO_COUNT] = {"menu", "start", "pause"};
         String menuViewStrings[MENU_IO_COUNT] = {"delay", "gain", "range", "calibration"};
@@ -79,13 +81,7 @@ class UTView
 
         void showSplashScreen();
 
-        void switchView(view newView);
-
-        void showMainView();
-        void showMenuView();
-        void showCalibrateView();
-        void showDelayView();
-        void showGainView();
+        void switchView(view newView, uint8_t position);
 
         void leftPress();
         void rightPress();
@@ -94,6 +90,21 @@ class UTView
         void enterPress();
 
         void handleMainEnterPress();
+        void handleMenuEnterPress();
+        void handleDelayEnterPress();
+        void handleGainEnterPress();
+        void handleRangeEnterPress();
+        void handleCalibrateEnterPress();
+
+        void showMainView();
+        void showMenuView();
+        void showCalibrateView();
+        void showDelayView();
+        void showGainView();
+        void showRangeView();
+
+        void drawAdjustmentFrame();
+        void clearAdjustmentFrame();
 
         void incrementDelay(bool up);
         void incrementGain(bool up); 
@@ -103,10 +114,12 @@ class UTView
         void drawGraph();
         void drawMainViewButtons();
         void drawMenuViewButtons();
+        void drawDelayAdjuster();
 
         void moveInputCursor(_input i);
         void moveMainCursor(_input i);
         void moveMenuCursor(_input i);
+        void moveDelayCursor(_input i);
 };
 
 #endif
