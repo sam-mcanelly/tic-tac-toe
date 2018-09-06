@@ -5,6 +5,8 @@ To Do
 ++++++++++++++++++++++++++++++++++++
 - add views for adjusting parameters in the menu
 - connect views to UTPing for setting parameters
+- make ui components into their own classes and objects
+  so that they can be created/destroyed
 
 
 ++++++++++++++++++++++++++++++++++++
