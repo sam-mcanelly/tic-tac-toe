@@ -11,6 +11,7 @@
 #include <Adafruit_SSD1306.h>
 
 #include "UTMain.h"
+#include "UTGraph.h"
 //#include <UTPing.h>
 
 class UTView
@@ -24,8 +25,14 @@ class UTView
 
     private:
         uint16_t componentPosition;
-        UTStack<UTComponent> components();
+        UTStack<UTComponent*> components();
         UTMain *main;
+        UTGraph *graph;
+
+        UTComponent *view_components[2] = {main, graph};
+        UTComponent *active_component;
+        uint8_t active_component_idx = 0;
+        //UTMenu *menu;
         bool running;
 
         String stop = "stop";
@@ -33,16 +40,12 @@ class UTView
 
         void showSplashScreen();
 
-        void switchView(view newView, uint8_t position);
-
-        void handleMainEnterPress();
-        void handleMenuEnterPress();
-        void handleDelayEnterPress();
-        void handleGainEnterPress();
-        void handleRangeEnterPress();
-        void handleCalibrateEnterPress();
-
-        void setCursor(XYPos_t position);
+        // void handleMainEnterPress();
+        // void handleMenuEnterPress();
+        // void handleDelayEnterPress();
+        // void handleGainEnterPress();
+        // void handleRangeEnterPress();
+        // void handleCalibrateEnterPress();
 };
 
 #endif

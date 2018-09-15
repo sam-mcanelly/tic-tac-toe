@@ -6,10 +6,10 @@
 
 class UTMain : public UTComponent {
     public:
-        UTMain(Adafruit_SSD1306 *_display){
+        UTMain(Adafruit_SSD1306 *_display, UTGraph *_graph){
             display = _display;
             graphActive = false;
-            //graph = new UTGraph(_display);
+            graph = _graph;
         }
 
         ~UTMain() override {
@@ -17,9 +17,12 @@ class UTMain : public UTComponent {
         }
 
         void create();
-
         XYPos_t getCursorPositionLocation();
         XYPos_t getPositionXY(uint8_t position);
+
+        void changeCursorPosition(uint8_t new_position);
+
+        void setCursor(XYPos_t position);
 
         void buttonPress(_input i);
     private:

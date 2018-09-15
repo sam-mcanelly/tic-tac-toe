@@ -9,8 +9,11 @@ void UTView::begin()
     
     running = false;
 
-    main = new UTMain(&display);
-    components.push(main);
+    graph = new UTGraph(&display);
+    main = new UTMain(&display, graph);
+
+    active_component = main;
+    main->create();
 }
 
 bool UTView::isRunning()
@@ -37,34 +40,6 @@ void UTView::showSplashScreen()
     display.stopscroll();
     display.clearDisplay();   // clears the screen and buffer
     display.display();
-}
-
-void UTView::switchView(view newView, uint8_t position)
-{
-    //don't do anything if the transducer is working
-    if(running) return;
-
-    switch(newView)
-    {
-        case MAIN:
-            
-            break;
-        case MENU:
-            
-            break;
-        case CALIBRATE:
-            
-            break;
-        case GAIN:
-            
-            break;
-        case RANGE:
-            
-            break;
-        case DELAY:
-            
-            break;
-    }
 }
 
 

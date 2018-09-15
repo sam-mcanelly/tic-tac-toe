@@ -14,23 +14,17 @@ class UTComponent
     public:
         virtual void create();
         virtual XYPos_t getCursorPositionLocation();
-        virtual XYPos_t getPositionXY(uint8_t position) = 0;
+        virtual XYPos_t getPositionXY(uint8_t position);
 
-        virtual ~UTComponent();
+        virtual ~UTComponent() {};
 
         uint8_t getCursorPosition() {
-            return inputCursorPosition;
+            return input_cursor_position;
         };
 
-        void setCursorPosition(uint8_t newPosition) {
-            inputCursorPosition = newPosition;
-            setCursor(getPositionXY(newPosition));
-        };
+        virtual void changeCursorPosition(uint8_t new_position);
 
-        void setCursor(XYPos_t position) {
-            //sets cursor to draw, not input cursor
-            display->setCursor(position.x, position.y);
-        }
+        virtual void setCursor(XYPos_t position);
 
         virtual void buttonPress(_input i) {
             switch(i) {
@@ -49,7 +43,8 @@ class UTComponent
 
     protected:
         Adafruit_SSD1306 *display;
-        uint8_t inputCursorPosition;
+
+        uint8_t input_cursor_position = 0;
 
         virtual void moveInputCursor(_input i);
 

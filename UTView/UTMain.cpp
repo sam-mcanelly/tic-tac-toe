@@ -3,23 +3,35 @@
 void UTMain::create() {
     graph->create();
     drawMainViewButtons();
+    changeCursorPosition(input_cursor_position);
     display->display();
+}
+
+void UTMain::changeCursorPosition(uint8_t new_position) {
+    display->setCursor(mainInputPositions[input_cursor_position].x, mainInputPositions[input_cursor_position].y);
+    display->setTextColor(WHITE, BLACK);
+    display->println(mainViewStrings[input_cursor_position]);
+    input_cursor_position = new_position;
+    setCursor(getCursorPositionLocation());
+}
+
+void UTMain::setCursor(XYPos_t position) {
+    //sets cursor to draw, not input cursor
+    display->setCursor(position.x, position.y);
+    display->setTextColor(BLACK, WHITE);
+    display->println(mainViewStrings[input_cursor_position]);
 }
 
 void UTMain::drawMainViewButtons() 
 {
     uint8_t menuPos = 0;
 
-    setCursor(menuPosition);
-    display->setTextColor(BLACK, WHITE);
-    display->println(mainViewStrings[menuPos++]);
-    
-    setCursor(startPosition);
     display->setTextColor(WHITE, BLACK);
-    display->println(mainViewStrings[menuPos++]);
 
-    setCursor(pausePosition);
-    display->println(mainViewStrings[menuPos++]);
+    for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {
+        display->setCursor(mainInputPositions[i].x, mainInputPositions[i].y);
+        display->println(mainViewStrings[i]);
+    }
 }
 
 void UTMain::moveInputCursor(_input i)
@@ -32,28 +44,28 @@ void UTMain::moveInputCursor(_input i)
             break;
         case LEFT: 
             //set the old one to the non-selected mode
-            setCursor(mainInputPositions[inputCursorPosition]);
+            setCursor(mainInputPositions[input_cursor_position]);
             display->setTextColor(WHITE, BLACK);
-            display->println(mainViewStrings[inputCursorPosition]);
+            display->println(mainViewStrings[input_cursor_position]);
 
             //update the newly selected position
-            inputCursorPosition -= 1;
-            if(inputCursorPosition < 0) inputCursorPosition = MAIN_IO_COUNT - 1;
-            setCursor(mainInputPositions[inputCursorPosition]);
+            input_cursor_position -= 1;
+            if(input_cursor_position < 0) input_cursor_position = MAIN_IO_COUNT - 1;
+            setCursor(mainInputPositions[input_cursor_position]);
             display->setTextColor(BLACK, WHITE);
-            display->println(mainViewStrings[inputCursorPosition]);
+            display->println(mainViewStrings[input_cursor_position]);
             break;
         case RIGHT:
             //set the old one to the non-selected mode
-            setCursor(mainInputPositions[inputCursorPosition]);
+            setCursor(mainInputPositions[input_cursor_position]);
             display->setTextColor(WHITE, BLACK);
-            display->println(mainViewStrings[inputCursorPosition]);
+            display->println(mainViewStrings[input_cursor_position]);
 
             //update the newly selected position
-            inputCursorPosition = (inputCursorPosition + 1) % MAIN_IO_COUNT; 
-            setCursor(mainInputPositions[inputCursorPosition]);
+            input_cursor_position = (input_cursor_position + 1) % MAIN_IO_COUNT; 
+            setCursor(mainInputPositions[input_cursor_position]);
             display->setTextColor(BLACK, WHITE);
-            display->println(mainViewStrings[inputCursorPosition]);
+            display->println(mainViewStrings[input_cursor_position]);
             break;
     }
 
@@ -62,7 +74,7 @@ void UTMain::moveInputCursor(_input i)
 
 XYPos_t UTMain::getCursorPositionLocation() {
     if(!graphActive) {
-        return mainInputPositions[inputCursorPosition];
+        return mainInputPositions[input_cursor_position];
     } else {
 
     }
@@ -109,7 +121,7 @@ void UTMain::downPress() {
 }
 
 void UTMain::enterPress() {
-    switch(inputCursorPosition) {
+    switch(input_cursor_position) {
         case 0: //menu
             //switchView(MENU, 0);
             break;
