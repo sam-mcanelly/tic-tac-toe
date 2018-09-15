@@ -1,3 +1,12 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTMain
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #ifndef UTMain_h
 #define UTMain_h
 
@@ -22,8 +31,6 @@ class UTMain : public UTComponent {
 
         void changeCursorPosition(uint8_t new_position);
 
-        void setCursor(XYPos_t position);
-
         void buttonPress(_input i);
     private:
         UTGraph *graph;
@@ -38,7 +45,7 @@ class UTMain : public UTComponent {
 
         String mainViewStrings[MAIN_IO_COUNT] = {"menu", "start", "pause"};
 
-        void moveInputCursor(_input i);
+        void setCursor(XYPos_t position);
 
         void leftPress();
         void rightPress();

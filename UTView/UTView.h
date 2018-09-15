@@ -21,7 +21,7 @@ class UTView
         void begin();
         bool isRunning();
 
-        void handlePress(uint8_t i);
+        void handlePress(_input i);
 
     private:
         uint16_t componentPosition;

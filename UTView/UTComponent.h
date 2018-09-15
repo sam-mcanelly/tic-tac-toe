@@ -1,3 +1,12 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTComponent
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #ifndef UTComponent_h
 #define UTComponent_h
 
@@ -24,8 +33,6 @@ class UTComponent
 
         virtual void changeCursorPosition(uint8_t new_position);
 
-        virtual void setCursor(XYPos_t position);
-
         virtual void buttonPress(_input i) {
             switch(i) {
                 case 0:
@@ -46,7 +53,7 @@ class UTComponent
 
         uint8_t input_cursor_position = 0;
 
-        virtual void moveInputCursor(_input i);
+        virtual void setCursor(XYPos_t position);
 
         //these are pretty redundant so maybe remove them
         virtual void leftPress();

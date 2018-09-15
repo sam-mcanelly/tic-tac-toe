@@ -1,3 +1,12 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTTypes
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #ifndef UTTypes_h
 #define UTTypes_h
 

@@ -1,3 +1,12 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTGraph
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #ifndef UTGraph_h
 #define UTGraph_h
 
@@ -14,7 +23,6 @@ class UTGraph : public UTComponent {
         void changeCursorPosition(uint8_t position);
         void setCursor(XYPos_t position);
     private:
-        void moveInputCursor(_input i);
 
         void leftPress();
         void rightPress();

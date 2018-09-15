@@ -1,9 +1,17 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTView
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #include "UTView.h"
 
 Adafruit_SSD1306 display(OLED_RESET);
 
-void UTView::begin()
-{
+void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
     showSplashScreen();
     
@@ -16,17 +24,15 @@ void UTView::begin()
     main->create();
 }
 
-bool UTView::isRunning()
-{
+bool UTView::isRunning() {
     return running;
 }
 
-void UTView::handlePress(uint8_t i) {
-
+void UTView::handlePress(_input i) {
+    active_component->buttonPress(i);
 }
 
-void UTView::showSplashScreen()
-{
+void UTView::showSplashScreen() {
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -42,73 +48,6 @@ void UTView::showSplashScreen()
     display.display();
 }
 
-
-// void UTView::handleMainEnterPress()
-// {
-//     switch(inputCursorPosition)
-//     {
-//         case 0: //menu
-//             //add menu to stack
-            
-//             break;
-//         case 1: //start
-//             break;
-//         case 2: //pause
-//             break;
-//     }
-// }
-
-// void UTView::handleMenuEnterPress()
-// {
-//     switch(inputCursorPosition)
-//     {
-//         case 0: //delay
-            
-//             break;
-//         case 1: //gain
-            
-//             break;
-//         case 2: //range
-            
-//             break;
-//         case 3: //calibrate
-            
-//             break;
-//     }
-// }
-
-// void UTView::handleDelayEnterPress()
-// {
-
-// }
-
-// void UTView::handleGainEnterPress()
-// {
-// }
-
-// void UTView::handleRangeEnterPress()
-// {
-
-// }
-
-// void UTView::handleCalibrateEnterPress()
-// {
-
-// }
-
-// void UTView::moveInputCursor(_input i)
-// {
-//     switch(currentView)
-//     {
-//         case MAIN:
-//             moveMainCursor(i);
-//             break;
-//         case MENU:
-//             moveMenuCursor(i);
-//             break;
-
-//     }
-// }
 
 
 

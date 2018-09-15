@@ -1,3 +1,12 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTStack
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #ifndef UTStack_h
 #define UTStack_h
 
