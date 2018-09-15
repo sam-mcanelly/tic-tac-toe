@@ -2,7 +2,7 @@
 #define UTComponent_h
 
 #include "Arduino.h"
-#include "UTView.h"
+#include "UTTypes.h"
 
 #include <Wire.h>
 #include <SPI.h>
@@ -12,17 +12,27 @@
 class UTComponent 
 {
     public:
-        virtual void create() = 0;
-        virtual void destroy() = 0;
+        virtual void create();
+        virtual XYPos_t getCursorPositionLocation();
+        virtual XYPos_t getPositionXY(uint8_t position) = 0;
 
-        void getCursorPosition() {
+        virtual ~UTComponent();
+
+        uint8_t getCursorPosition() {
             return inputCursorPosition;
         };
+
         void setCursorPosition(uint8_t newPosition) {
-            inputCursorPosition = input;
+            inputCursorPosition = newPosition;
+            setCursor(getPositionXY(newPosition));
         };
 
-        void buttonPress(_input i) {
+        void setCursor(XYPos_t position) {
+            //sets cursor to draw, not input cursor
+            display->setCursor(position.x, position.y);
+        }
+
+        virtual void buttonPress(_input i) {
             switch(i) {
                 case 0:
                     return upPress();
@@ -38,16 +48,17 @@ class UTComponent
         };
 
     protected:
-        Adafruit_GFX *display;
+        Adafruit_SSD1306 *display;
         uint8_t inputCursorPosition;
 
-        virtual void moveInputCursor(_input i) = 0;
+        virtual void moveInputCursor(_input i);
 
-        virtual void leftPress() = 0;
-        virtual void rightPress() = 0;
-        virtual void upPress() = 0;
-        virtual void downPress() = 0;
-        virtual void enterPress() = 0; 
+        //these are pretty redundant so maybe remove them
+        virtual void leftPress();
+        virtual void rightPress();
+        virtual void upPress();
+        virtual void downPress();
+        virtual void enterPress(); 
 
     private:       
 
