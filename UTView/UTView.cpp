@@ -1,29 +1,100 @@
+/****************************************
+ * 
+ * Ultrasonic Flaw Detector - UTView
+ * Author(s): Sam McAnelly, 
+ * Oklahoma State University
+ * ECEN 4013
+ * 
+ ****************************************/
+
 #include "UTView.h"
 
 Adafruit_SSD1306 display(OLED_RESET);
 
-UTView::UTView()
-{
-
-}
-
-void UTView::begin()
-{
+void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
-    showSplashScreen();
-    switchView(MAIN, 0);
-    running = false;
-    inputCursorPosition = 0;
+    //showSplashScreen();
 
+    graph = new UTGraph(&display);
+    main = new UTMain(&display, graph);
+    menu = new UTMenu(&display);
+    delay_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._delay,
+                                    adjustment_parameters._delay_digits,
+                                    micro_seconds);
+    gain_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._gain,
+                                    adjustment_parameters._gain_digits,
+                                    decibal);
+    range_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._range,
+                                    adjustment_parameters._range_digits,
+                                    meters);
+
+
+    view_components[0] = main;
+    active_component_idx = 0;
+    active_component = main;
+    
+    redrawAll();
 }
 
-bool UTView::isRunning()
-{
-    return running;
+boolean UTView::isRunning() {
+    return graph->isRunning();
 }
 
-void UTView::showSplashScreen()
-{
+void UTView::handlePress(input_t i) {
+    view_t new_view = active_component->buttonPress(i);
+    switch(new_view) {
+        case NONE:
+            return;
+        case BACK:
+            Serial.println("Moving back a view...");
+            removeTopView();
+            return;
+        case MENU:
+            Serial.println("Switching to Menu view...");
+            addView(menu);
+            return;
+        case MAIN:
+            Serial.println("Switching to Main view...");
+            exitToMainView();
+            return;
+        case DELAY:
+            Serial.println("Opening Delay Adjuster...");
+            addView(delay_adjuster);
+            return;
+        case GAIN:
+            Serial.println("Opening Gain Adjuster...");
+            addView(gain_adjuster);
+            return;
+        case RANGE:
+            Serial.println("Opening Range Adjuster...");
+            addView(range_adjuster);
+            return;
+        case CALIBRATE:
+            Serial.println("Opening Calibration tool...");
+            return;
+          
+    }
+}
+
+void UTView::populateAdjustmentParams() {
+    adjustment_parameters._delay = 0.0;
+    adjustment_parameters._range = 1.0;
+    adjustment_parameters._gain = 1.0;
+
+    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
+        adjustment_parameters._delay_digits[i] = 0;
+        adjustment_parameters._range_digits[i] = 0;
+        adjustment_parameters._gain_digits[i] = 0;
+    }
+
+    adjustment_parameters._range_digits[1] = 1;
+    adjustment_parameters._gain_digits[1] = 1;
+}
+
+void UTView::showSplashScreen() {
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -39,456 +110,54 @@ void UTView::showSplashScreen()
     display.display();
 }
 
-void UTView::switchView(view newView, uint8_t position)
-{
-    //don't do anything if the transducer is working
-    if(running) return;
-
-    currentView = newView;
-    inputCursorPosition = position;
-
-    switch(newView)
-    {
-        case MAIN:
-            showMainView();
-            break;
-        case MENU:
-            showMenuView();
-            break;
-        case CALIBRATE:
-            showCalibrateView();
-            break;
-        case GAIN:
-            showGainView();
-            break;
-        case RANGE:
-            showRangeView();
-            break;
-        case DELAY:
-            showDelayView();
-            break;
+void UTView::addView(UTComponent *new_view) {
+    //check for out of bounds
+    active_component_idx++;
+    if(active_component_idx > MAX_COMPONENT_IDX) {
+        Serial.println("ERROR - UI component stack size limit reached!");
+        active_component_idx--;
+        return;
     }
+
+    view_components[active_component_idx] = new_view;
+    active_component = new_view;
+    active_component->create(true);
 }
 
-void UTView::handlePress(uint8_t i)
-{
-    //this matches the mapping in the controller file
-    switch(i)
-    {
-        case 0: 
-            return upPress();
-            break;
-        case 1: 
-            return downPress();
-            break;
-        case 2: 
-            return leftPress();
-            break;
-        case 3: 
-            return rightPress();
-            break;
-        case 4: 
-            return enterPress();
-            break;
+void UTView::removeTopView() {
+    if(active_component_idx == 0) {
+        Serial.println("ERROR - Trying to delete main view... aborting");
+        return;
     }
+
+    view_components[active_component_idx] = NULL;
+    active_component_idx--;
+    active_component = view_components[active_component_idx];
+    redrawAll();
 }
 
-void UTView::leftPress()
-{
-    switch(currentView)
-    {
-        case MAIN:
-            moveInputCursor(LEFT);
-            break;
-        case MENU:
-            switchView(MAIN, 0);
-            break;
-        case CALIBRATE:
-            break;
-        case DELAY:
-            break;
-        case GAIN:
-            break;
+void UTView::exitToMainView() {
+    //remove all pointers to anything above main
+    for(uint8_t i = 1; i <= active_component_idx; i++) {
+        view_components[i] = NULL;
     }
+
+    active_component_idx = 0;
+    active_component = main;
+    redrawAll();
 }
 
-void UTView::rightPress()
-{
-    switch(currentView)
-    {
-        case MAIN:
-            moveInputCursor(RIGHT);
-            break;
-        case MENU:
-            break;
-        case CALIBRATE:
-            break;
-        case DELAY:
-            break;
-        case GAIN:
-            break;
-    }
-}
-
-void UTView::upPress()
-{
-    switch(currentView)
-    {
-        case MAIN:
-            break;
-        case MENU:  
-            moveInputCursor(UP);
-            break;
-        case CALIBRATE:
-            break;
-        case DELAY:
-            break;
-        case GAIN:
-            break;
-    }
-}
-
-void UTView::downPress()
-{
-    switch(currentView)
-    {
-        case MAIN:
-            break;
-        case MENU:
-            moveInputCursor(DOWN);
-            break;
-        case CALIBRATE:
-            break;
-        case DELAY:
-            break;
-        case GAIN:
-            break;      
-    }
-}
-
-void UTView::enterPress()
-{
-    switch(currentView)
-    {
-        case MAIN:
-            handleMainEnterPress();
-            break;
-        case MENU:
-            handleMenuEnterPress();
-            break;
-        case CALIBRATE:
-            handleCalibrateEnterPress();
-            break;
-        case DELAY:
-            handleDelayEnterPress();
-            break;
-        case GAIN:
-            handleGainEnterPress();
-            break;       
-        case RANGE:
-            handleRangeEnterPress();
-            break;
-    }
-}
-
-void UTView::handleMainEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        case 0: //menu
-            switchView(MENU, 0);
-            break;
-        case 1: //start
-            break;
-        case 2: //pause
-            break;
-    }
-}
-
-void UTView::handleMenuEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        case 0: //delay
-            switchView(DELAY, 0);
-            break;
-        case 1: //gain
-            switchView(GAIN, 0);
-            break;
-        case 2: //range
-            switchView(RANGE, 0);
-            break;
-        case 3: //calibrate
-            switchView(CALIBRATE, 0);
-            break;
-    }
-}
-
-void UTView::handleDelayEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        default:
-            clearAdjustmentFrame();
-            switchView(MENU, 0);
-            break;
-    }
-}
-
-void UTView::handleGainEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        default:
-            clearAdjustmentFrame();
-            switchView(MENU, 1);
-            break;
-    }
-}
-
-void UTView::handleRangeEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        default:
-            clearAdjustmentFrame();
-            switchView(MENU, 2);
-            break;
-    }
-}
-
-void UTView::handleCalibrateEnterPress()
-{
-    switch(inputCursorPosition)
-    {
-        default:
-            clearAdjustmentFrame();
-            switchView(MENU, 3);
-            break;
-    }
-}
-
-
-void UTView::showMainView()
-{
+void UTView::redrawAll() {
     display.clearDisplay();
-    drawGraph();
-    drawMainViewButtons();
-    display.display();
-}
-
-void UTView::showMenuView()
-{
-    //create border for menu
-    display.fillRect(0, 10, 70, 42, BLACK);
-    display.drawRect(0, 10, 70, 42, WHITE);
-
-    drawMenuViewButtons();
-
-    display.display();
-}
-
-void UTView::showCalibrateView()
-{
-    drawAdjustmentFrame();
-
-    display.display();
-}
-
-void UTView::showDelayView()
-{
-    drawAdjustmentFrame();
-    drawDelayAdjuster();
-
-    display.display();
-}
-
-void UTView::showGainView()
-{
-    drawAdjustmentFrame();
-
-    display.display();
-}
-
-void UTView::showRangeView()
-{
-    drawAdjustmentFrame();
-
-    display.display();
-}
-
-void UTView::drawAdjustmentFrame()
-{
-    display.fillRect(20, 2, 100, 40, BLACK);
-    display.drawRect(20, 2, 100, 40, WHITE);
-    display.display();
-}
-
-void UTView::clearAdjustmentFrame()
-{
-    display.fillRect(20, 2, 100, 40, BLACK);
-}
-
-void UTView::setCursor(XYPos_t position)
-{
-    display.setCursor(position.x, position.y);
-}
-
-void UTView::drawGraph()
-{
-    display.drawFastVLine(1, 1, 50, WHITE);
-    display.drawFastHLine(1, 50, 125, WHITE);
-}
-
-void UTView::drawMenuViewButtons()
-{
-    uint8_t menuPos = 0;
-
-    setCursor(delayPosition);
-    if(inputCursorPosition == menuPos)
-        display.setTextColor(BLACK, WHITE);
-    else
-        display.setTextColor(WHITE, BLACK);
-    display.println(menuViewStrings[menuPos++]);
-
-    setCursor(gainPosition);
-    if(inputCursorPosition == menuPos)
-        display.setTextColor(BLACK, WHITE);
-    else
-        display.setTextColor(WHITE, BLACK);
-    display.println(menuViewStrings[menuPos++]);
-
-    setCursor(rangePosition);
-    if(inputCursorPosition == menuPos)
-        display.setTextColor(BLACK, WHITE);
-    else
-        display.setTextColor(WHITE, BLACK);
-    display.println(menuViewStrings[menuPos++]);
-    
-    setCursor(calibratePosition);    
-    if(inputCursorPosition == menuPos)
-        display.setTextColor(BLACK, WHITE);
-    else
-        display.setTextColor(WHITE, BLACK);
-    display.println(menuViewStrings[menuPos++]);
-}
-
-void UTView::drawMainViewButtons() 
-{
-    uint8_t menuPos = 0;
-
-    setCursor(menuPosition);
-    display.setTextColor(BLACK, WHITE);
-    display.println(mainViewStrings[menuPos++]);
-    
-    setCursor(startPosition);
-    display.setTextColor(WHITE, BLACK);
-    display.println(mainViewStrings[menuPos++]);
-
-    setCursor(pausePosition);
-    display.println(mainViewStrings[menuPos++]);
-}
-
-void UTView::drawDelayAdjuster()
-{
-    //get current value from UTPing object
-    double pulseDelay = 0.1;
-
-    String sPulseDelay(pulseDelay, 1);
-
-}
-
-void UTView::moveInputCursor(_input i)
-{
-    switch(currentView)
-    {
-        case MAIN:
-            moveMainCursor(i);
-            break;
-        case MENU:
-            moveMenuCursor(i);
-            break;
-
+    display.setTextSize(1);
+    for(uint8_t i = 0; i <= active_component_idx; i++) {
+        if(i == 0)
+            main->showGraph();
+        view_components[i]->create(false);
     }
-}
-
-void UTView::moveMainCursor(_input i)
-{
-    switch(i)
-    {
-        case UP:
-            break;
-        case DOWN: 
-            break;
-        case LEFT: 
-            //set the old one to the non-selected mode
-            setCursor(mainInputPositions[inputCursorPosition]);
-            display.setTextColor(WHITE, BLACK);
-            display.println(mainViewStrings[inputCursorPosition]);
-
-            //update the newly selected position
-            inputCursorPosition -= 1;
-            if(inputCursorPosition < 0) inputCursorPosition = MAIN_IO_COUNT - 1;
-            setCursor(mainInputPositions[inputCursorPosition]);
-            display.setTextColor(BLACK, WHITE);
-            display.println(mainViewStrings[inputCursorPosition]);
-            break;
-        case RIGHT:
-            //set the old one to the non-selected mode
-            setCursor(mainInputPositions[inputCursorPosition]);
-            display.setTextColor(WHITE, BLACK);
-            display.println(mainViewStrings[inputCursorPosition]);
-
-            //update the newly selected position
-            inputCursorPosition = (inputCursorPosition + 1) % MAIN_IO_COUNT; 
-            setCursor(mainInputPositions[inputCursorPosition]);
-            display.setTextColor(BLACK, WHITE);
-            display.println(mainViewStrings[inputCursorPosition]);
-            break;
-    }
-
     display.display();
 }
 
-void UTView::moveMenuCursor(_input i)
-{
-    switch(i)
-    {
-        case UP:
-            //set the old one to the non-selected mode
-            setCursor(menuInputPositions[inputCursorPosition]);
-            display.setTextColor(WHITE, BLACK);
-            display.println(menuViewStrings[inputCursorPosition]);
-
-            //update the newly selected position
-            inputCursorPosition -= 1;
-            if(inputCursorPosition < 0) inputCursorPosition = MENU_IO_COUNT - 1;
-            setCursor(menuInputPositions[inputCursorPosition]);
-            display.setTextColor(BLACK, WHITE);
-            display.println(menuViewStrings[inputCursorPosition]);
-            break;
-        case DOWN:
-            //set the old one to the non-selected mode
-            setCursor(menuInputPositions[inputCursorPosition]);
-            display.setTextColor(WHITE, BLACK);
-            display.println(menuViewStrings[inputCursorPosition]);
-
-            //update the newly selected position
-            inputCursorPosition = (inputCursorPosition + 1) % MENU_IO_COUNT;
-            if(inputCursorPosition < 0) inputCursorPosition = MENU_IO_COUNT - 1;
-            setCursor(menuInputPositions[inputCursorPosition]);
-            display.setTextColor(BLACK, WHITE);
-            display.println(menuViewStrings[inputCursorPosition]);
-            break;
-    }
-
-    display.display();
-}
-
-void UTView::moveDelayCursor(_input i)
-{
-
-}
 
 
 

@@ -16,13 +16,7 @@
  * 
  ****************************************/
 #include <UTView.h>
-
-#define IO_COUNT 5
-#define LEFT_PIN 2
-#define ENTER_PIN 3
-#define UP_PIN 4
-#define RIGHT_PIN 5
-#define DOWN_PIN 6
+#include <UTTypes.h>
 
 uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN};
 
@@ -39,7 +33,7 @@ void setup() {
   pinMode(RIGHT_PIN, INPUT_PULLUP);
   pinMode(DOWN_PIN, INPUT_PULLUP);
 
-  attachInterrupt(digitalPinToInterrupt(ENTER_PIN), handleInterrupt, LOW);
+  attachInterrupt(digitalPinToInterrupt(ENTER_PIN), handleEnterPress, LOW);
   
   view.begin();
   
@@ -57,15 +51,15 @@ void loop() {
 
 }
 
-void handleInterrupt()
+void handleEnterPress()
 {
   //de-bouncing
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) 
+  if (interrupt_time - last_interrupt_time > 300) 
   {
     Serial.println("Enter pressed!");
-    view.handlePress(4); //enter's position in the array 
+    view.handlePress((input_t)4); //enter's position in the array 
   }
   last_interrupt_time = interrupt_time;
 }
@@ -78,7 +72,7 @@ void checkButtons()
     if(input == LOW)
     {
       delay(200); //debounce
-      view.handlePress(i);
+      view.handlePress((input_t)i);
     }
     
   }
