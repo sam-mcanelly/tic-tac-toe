@@ -26,6 +26,8 @@ class UTMain : public UTComponent {
         }
 
         void create(boolean show);
+        void showGraph();
+
         XYPos_t getCursorPositionLocation();
         XYPos_t getPositionXY(uint8_t position);
 

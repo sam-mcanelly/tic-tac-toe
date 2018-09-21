@@ -26,6 +26,10 @@ void UTMain::create(boolean show) {
         display->display();
 }
 
+void UTMain::showGraph() {
+    graph->renderCurrentFrame();
+}
+
 XYPos_t UTMain::getCursorPositionLocation() {
     if(!graphActive) {
         return mainInputPositions[input_cursor_position];
@@ -124,8 +128,11 @@ view_t UTMain::enterPress() {
             return MENU;
             break;
         case 1: //start
+            changeCursorPosition(2);
+            graph->runDemo();
             break;
         case 2: //pause
+            graph->stop();
             break;
     }
 

@@ -14,8 +14,6 @@ Adafruit_SSD1306 display(OLED_RESET);
 void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
     //showSplashScreen();
-    
-    running = false;
 
     graph = new UTGraph(&display);
     main = new UTMain(&display, graph);
@@ -41,8 +39,8 @@ void UTView::begin() {
     redrawAll();
 }
 
-bool UTView::isRunning() {
-    return running;
+boolean UTView::isRunning() {
+    return graph->isRunning();
 }
 
 void UTView::handlePress(input_t i) {
@@ -153,6 +151,8 @@ void UTView::redrawAll() {
     display.clearDisplay();
     display.setTextSize(1);
     for(uint8_t i = 0; i <= active_component_idx; i++) {
+        if(i == 0)
+            main->showGraph();
         view_components[i]->create(false);
     }
     display.display();

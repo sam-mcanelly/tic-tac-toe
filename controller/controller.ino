@@ -18,13 +18,6 @@
 #include <UTView.h>
 #include <UTTypes.h>
 
-#define IO_COUNT 5
-#define LEFT_PIN 2
-#define ENTER_PIN 3
-#define UP_PIN 4
-#define RIGHT_PIN 5
-#define DOWN_PIN 6
-
 uint8_t buttonPins[IO_COUNT] = {UP_PIN, DOWN_PIN, LEFT_PIN, RIGHT_PIN};
 
 UTView view;
@@ -63,8 +56,9 @@ void handleEnterPress()
   //de-bouncing
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) 
+  if (interrupt_time - last_interrupt_time > 300) 
   {
+    Serial.println("Enter pressed!");
     view.handlePress((input_t)4); //enter's position in the array 
   }
   last_interrupt_time = interrupt_time;

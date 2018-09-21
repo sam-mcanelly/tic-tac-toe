@@ -41,13 +41,13 @@ class UTView
         };
 
         void begin();
-        bool isRunning();
+
+        boolean isRunning();
 
         void handlePress(input_t i);
 
     private:
         uint8_t active_component_idx;
-        bool running;
 
         adjustment_params_t adjustment_parameters;
         

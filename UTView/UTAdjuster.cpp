@@ -257,6 +257,12 @@ void UTAdjuster::saveAdjustmentValue() {
     *adjustment_value = result;
     Serial.print("Saved adjustment: ");
     Serial.println(result);
+
+    display->fillRect(24, 34, 4, 4, WHITE);
+    display->display();
+    delay(300);
+    display->fillRect(24, 34, 4, 4, BLACK);
+    display->display();
 }
 
 void UTAdjuster::discardAdjustmentValue() {
