@@ -20,9 +20,13 @@
 void UTGraph::create(boolean show) {
     display->drawFastVLine(1, 1, 50, WHITE);
     display->drawFastHLine(1, 50, 125, WHITE);
-    
+
     if(show)
         display->display();
+}
+
+void UTGraph::update() {
+    renderCurrentFrame();
 }
 
 XYPos_t UTGraph::getCursorPositionLocation() {
@@ -55,3 +59,7 @@ view_t UTGraph::upPress() {return NONE;}
 view_t UTGraph::downPress() {return NONE;}
 
 view_t UTGraph::enterPress() {return NONE;}
+
+void UTGraph::renderCurrentFrame() {
+    
+}

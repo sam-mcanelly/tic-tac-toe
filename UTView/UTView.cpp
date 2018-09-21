@@ -20,6 +20,19 @@ void UTView::begin() {
     graph = new UTGraph(&display);
     main = new UTMain(&display, graph);
     menu = new UTMenu(&display);
+    delay_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._delay,
+                                    adjustment_parameters._delay_digits,
+                                    micro_seconds);
+    gain_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._gain,
+                                    adjustment_parameters._gain_digits,
+                                    decibal);
+    range_adjuster = new UTAdjuster(&display,
+                                    &adjustment_parameters._range,
+                                    adjustment_parameters._range_digits,
+                                    meters);
+
 
     view_components[0] = main;
     active_component_idx = 0;
@@ -37,16 +50,50 @@ void UTView::handlePress(input_t i) {
     switch(new_view) {
         case NONE:
             return;
+        case BACK:
+            Serial.println("Moving back a view...");
+            removeTopView();
+            return;
         case MENU:
             Serial.println("Switching to Menu view...");
             addView(menu);
             return;
         case MAIN:
-            Serial.println("Switching back to Main view...");
+            Serial.println("Switching to Main view...");
             exitToMainView();
             return;
-            
+        case DELAY:
+            Serial.println("Opening Delay Adjuster...");
+            addView(delay_adjuster);
+            return;
+        case GAIN:
+            Serial.println("Opening Gain Adjuster...");
+            addView(gain_adjuster);
+            return;
+        case RANGE:
+            Serial.println("Opening Range Adjuster...");
+            addView(range_adjuster);
+            return;
+        case CALIBRATE:
+            Serial.println("Opening Calibration tool...");
+            return;
+          
     }
+}
+
+void UTView::populateAdjustmentParams() {
+    adjustment_parameters._delay = 0.0;
+    adjustment_parameters._range = 1.0;
+    adjustment_parameters._gain = 1.0;
+
+    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
+        adjustment_parameters._delay_digits[i] = 0;
+        adjustment_parameters._range_digits[i] = 0;
+        adjustment_parameters._gain_digits[i] = 0;
+    }
+
+    adjustment_parameters._range_digits[1] = 1;
+    adjustment_parameters._gain_digits[1] = 1;
 }
 
 void UTView::showSplashScreen() {
@@ -104,8 +151,9 @@ void UTView::exitToMainView() {
 
 void UTView::redrawAll() {
     display.clearDisplay();
+    display.setTextSize(1);
     for(uint8_t i = 0; i <= active_component_idx; i++) {
-        view_components[active_component_idx]->create(false);
+        view_components[i]->create(false);
     }
     display.display();
 }

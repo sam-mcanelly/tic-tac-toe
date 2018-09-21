@@ -45,6 +45,8 @@ class UTComponent
                     return rightPress();
                 case 4:
                     return enterPress();
+                default:
+                    return NONE;
             }   
         };
 

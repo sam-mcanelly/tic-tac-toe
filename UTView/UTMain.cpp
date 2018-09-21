@@ -21,7 +21,7 @@ void UTMain::create(boolean show) {
     graph->create(show);
     drawMainViewButtons();
     changeCursorPosition(input_cursor_position);
-    
+
     if(show)
         display->display();
 }
@@ -30,7 +30,7 @@ XYPos_t UTMain::getCursorPositionLocation() {
     if(!graphActive) {
         return mainInputPositions[input_cursor_position];
     } else {
-
+        return {0, 0};
     }
 }
 
@@ -38,7 +38,7 @@ XYPos_t UTMain::getPositionXY(uint8_t position) {
     if(!graphActive) {
         return mainInputPositions[position];
     } else {
-
+        return {0, 0};
     }
 }
 

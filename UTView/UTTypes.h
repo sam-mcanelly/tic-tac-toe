@@ -17,7 +17,9 @@
 
 #define MAIN_IO_COUNT 3
 #define MENU_IO_COUNT 4
-#define ADJUSTMENT_IO_COUNT 1
+#define ADJUSTMENT_IO_COUNT 2
+#define ADJUSTMENT_STRING_COUNT 2
+#define ADJUSTMENT_VALUE_DIGIT_COUNT 4
 
 #include "Arduino.h"
 
@@ -35,7 +37,8 @@ enum view_t
     RANGE,
     DELAY,
     GAIN,
-    NONE
+    NONE,
+    BACK
 };
 
 enum input_t
@@ -45,6 +48,17 @@ enum input_t
     LEFT,
     RIGHT,
     ENTER
+};
+
+struct adjustment_params_t 
+{
+    double _delay;
+    double _gain;
+    double _range;
+
+    uint8_t _delay_digits[4];
+    uint8_t _gain_digits[4];
+    uint8_t _range_digits[4];
 };
 
 #endif

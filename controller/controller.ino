@@ -40,7 +40,7 @@ void setup() {
   pinMode(RIGHT_PIN, INPUT_PULLUP);
   pinMode(DOWN_PIN, INPUT_PULLUP);
 
-  attachInterrupt(digitalPinToInterrupt(ENTER_PIN), handleInterrupt, LOW);
+  attachInterrupt(digitalPinToInterrupt(ENTER_PIN), handleEnterPress, LOW);
   
   view.begin();
   
@@ -58,7 +58,7 @@ void loop() {
 
 }
 
-void handleInterrupt()
+void handleEnterPress()
 {
   //de-bouncing
   static unsigned long last_interrupt_time = 0;

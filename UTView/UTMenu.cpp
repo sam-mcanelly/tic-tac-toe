@@ -35,7 +35,6 @@ XYPos_t UTMenu::getPositionXY(uint8_t position) {
 }
 
 void UTMenu::changeCursorPosition(uint8_t new_position) {
-    //Serial.println("changeCursorPosition called in Main view");
     if(new_position == MENU_IO_COUNT) new_position = 0;
     else if(new_position < 0) new_position = MENU_IO_COUNT - 1;
 
@@ -65,13 +64,9 @@ void UTMenu::setCursor(XYPos_t position) {
     display->println(menuViewStrings[input_cursor_position]);
 }
 
-view_t UTMenu::leftPress() {
-    return MAIN;
-}
+view_t UTMenu::leftPress() {return BACK;}
 
-view_t UTMenu::rightPress() {
-    return NONE;
-}
+view_t UTMenu::rightPress() {return NONE;}
 
 view_t UTMenu::upPress() {
     if(input_cursor_position == 0)
@@ -89,14 +84,16 @@ view_t UTMenu::downPress() {
 
 view_t UTMenu::enterPress() {
     switch(input_cursor_position) {
-        case 0: //
-            //switchView(MENU, 0);
-            break;
-        case 1: //
-            break;
-        case 2: //
-            break;
+        case 0: 
+            return DELAY;
+        case 1: 
+            return GAIN;
+        case 2: 
+            return RANGE;
+        case 3:
+            return CALIBRATE;
     }
+
     return NONE;
 }
 
