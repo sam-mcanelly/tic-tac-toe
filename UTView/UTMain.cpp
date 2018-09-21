@@ -17,11 +17,13 @@
  * 
  * */
 
-void UTMain::create() {
-    graph->create();
+void UTMain::create(boolean show) {
+    graph->create(show);
     drawMainViewButtons();
     changeCursorPosition(input_cursor_position);
-    display->display();
+    
+    if(show)
+        display->display();
 }
 
 XYPos_t UTMain::getCursorPositionLocation() {
@@ -41,18 +43,26 @@ XYPos_t UTMain::getPositionXY(uint8_t position) {
 }
 
 void UTMain::changeCursorPosition(uint8_t new_position) {
+    //Serial.println("changeCursorPosition called in Main view");
     if(new_position == MAIN_IO_COUNT) new_position = 0;
     else if(new_position < 0) new_position = MAIN_IO_COUNT - 1;
+
+    Serial.print("new cursor position:");
+    Serial.println(new_position);
 
     display->setCursor(mainInputPositions[input_cursor_position].x, mainInputPositions[input_cursor_position].y);
     display->setTextColor(WHITE, BLACK);
     display->println(mainViewStrings[input_cursor_position]);
     input_cursor_position = new_position;
     setCursor(getCursorPositionLocation());
+    display->display();
 }
 
-void UTMain::buttonPress(_input i) {
-    if(graphActive) return graph->buttonPress(i);
+view_t UTMain::buttonPress(input_t i) {
+    // Serial.print("buttonPress(");
+    // Serial.print(i);
+    // Serial.println(") was called");
+    //if(graphActive) return graph->buttonPress(i);
     switch(i) {
         case 0:
             return upPress();
@@ -64,6 +74,8 @@ void UTMain::buttonPress(_input i) {
             return rightPress();
         case 4:
             return enterPress();
+        default:
+            return rightPress();
     }  
 }
 
@@ -82,36 +94,45 @@ void UTMain::setCursor(XYPos_t position) {
     display->println(mainViewStrings[input_cursor_position]);
 }
 
-void UTMain::leftPress() {
-    changeCursorPosition(--input_cursor_position);
+view_t UTMain::leftPress() {
+    //Serial.println("leftPress() called in Main view");
+    if(input_cursor_position == 0)
+        changeCursorPosition(MAIN_IO_COUNT - 1);
+    else
+        changeCursorPosition(input_cursor_position - 1);
+
+    return NONE;
 }
 
-void UTMain::rightPress() {
-    changeCursorPosition(++input_cursor_position);
+view_t UTMain::rightPress() {
+    //Serial.println("rightPress() called in Main view");
+    changeCursorPosition(input_cursor_position + 1);
+    return NONE;
 }
 
-void UTMain::upPress() {
+view_t UTMain::upPress() {
+    return NONE;
 }
 
-void UTMain::downPress() {
+view_t UTMain::downPress() {
+    return NONE;
 }
 
-void UTMain::enterPress() {
+view_t UTMain::enterPress() {
     switch(input_cursor_position) {
         case 0: //menu
-            //switchView(MENU, 0);
+            return MENU;
             break;
         case 1: //start
             break;
         case 2: //pause
             break;
     }
+
+    return NONE;
 }
 
-void UTMain::drawMainViewButtons() 
-{
-    uint8_t menuPos = 0;
-
+void UTMain::drawMainViewButtons() {
     display->setTextColor(WHITE, BLACK);
 
     for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {

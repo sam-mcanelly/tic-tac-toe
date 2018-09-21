@@ -25,13 +25,13 @@ class UTMain : public UTComponent {
             delete graph;
         }
 
-        void create();
+        void create(boolean show);
         XYPos_t getCursorPositionLocation();
         XYPos_t getPositionXY(uint8_t position);
 
         void changeCursorPosition(uint8_t new_position);
 
-        void buttonPress(_input i);
+        view_t buttonPress(input_t i);
     private:
         UTGraph *graph;
         boolean graphActive; //are we currently interfacing with the graph?
@@ -47,11 +47,11 @@ class UTMain : public UTComponent {
 
         void setCursor(XYPos_t position);
 
-        void leftPress();
-        void rightPress();
-        void upPress();
-        void downPress();
-        void enterPress(); 
+        view_t leftPress();
+        view_t rightPress();
+        view_t upPress();
+        view_t downPress();
+        view_t enterPress(); 
 
         void drawMainViewButtons();
 };

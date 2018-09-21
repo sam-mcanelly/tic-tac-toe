@@ -65,8 +65,7 @@ void handleInterrupt()
   unsigned long interrupt_time = millis();
   if (interrupt_time - last_interrupt_time > 200) 
   {
-    Serial.println("Enter pressed!");
-    view.handlePress((_input)4); //enter's position in the array 
+    view.handlePress((input_t)4); //enter's position in the array 
   }
   last_interrupt_time = interrupt_time;
 }
@@ -79,7 +78,7 @@ void checkButtons()
     if(input == LOW)
     {
       delay(200); //debounce
-      view.handlePress((_input)i);
+      view.handlePress((input_t)i);
     }
     
   }

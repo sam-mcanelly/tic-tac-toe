@@ -15,7 +15,7 @@
 class UTGraph : public UTComponent {
     public:
         UTGraph(Adafruit_SSD1306 *_display) {display = _display;};
-        void create();
+        void create(boolean show);
 
         XYPos_t getCursorPositionLocation();
         XYPos_t getPositionXY(uint8_t position);
@@ -24,11 +24,11 @@ class UTGraph : public UTComponent {
         void setCursor(XYPos_t position);
     private:
 
-        void leftPress();
-        void rightPress();
-        void upPress();
-        void downPress();
-        void enterPress(); 
+        view_t leftPress();
+        view_t rightPress();
+        view_t upPress();
+        view_t downPress();
+        view_t enterPress(); 
 };
 
 #endif

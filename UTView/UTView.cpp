@@ -13,23 +13,40 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
-    showSplashScreen();
+    //showSplashScreen();
     
     running = false;
 
     graph = new UTGraph(&display);
     main = new UTMain(&display, graph);
+    menu = new UTMenu(&display);
 
+    view_components[0] = main;
+    active_component_idx = 0;
     active_component = main;
-    main->create();
+    
+    redrawAll();
 }
 
 bool UTView::isRunning() {
     return running;
 }
 
-void UTView::handlePress(_input i) {
-    active_component->buttonPress(i);
+void UTView::handlePress(input_t i) {
+    view_t new_view = active_component->buttonPress(i);
+    switch(new_view) {
+        case NONE:
+            return;
+        case MENU:
+            Serial.println("Switching to Menu view...");
+            addView(menu);
+            return;
+        case MAIN:
+            Serial.println("Switching back to Main view...");
+            exitToMainView();
+            return;
+            
+    }
 }
 
 void UTView::showSplashScreen() {
@@ -45,6 +62,51 @@ void UTView::showSplashScreen() {
     delay(8000);
     display.stopscroll();
     display.clearDisplay();   // clears the screen and buffer
+    display.display();
+}
+
+void UTView::addView(UTComponent *new_view) {
+    //check for out of bounds
+    active_component_idx++;
+    if(active_component_idx > MAX_COMPONENT_IDX) {
+        Serial.println("ERROR - UI component stack size limit reached!");
+        active_component_idx--;
+        return;
+    }
+
+    view_components[active_component_idx] = new_view;
+    active_component = new_view;
+    active_component->create(true);
+}
+
+void UTView::removeTopView() {
+    if(active_component_idx == 0) {
+        Serial.println("ERROR - Trying to delete main view... aborting");
+        return;
+    }
+
+    view_components[active_component_idx] = NULL;
+    active_component_idx--;
+    active_component = view_components[active_component_idx];
+    redrawAll();
+}
+
+void UTView::exitToMainView() {
+    //remove all pointers to anything above main
+    for(uint8_t i = 1; i <= active_component_idx; i++) {
+        view_components[i] = NULL;
+    }
+
+    active_component_idx = 0;
+    active_component = main;
+    redrawAll();
+}
+
+void UTView::redrawAll() {
+    display.clearDisplay();
+    for(uint8_t i = 0; i <= active_component_idx; i++) {
+        view_components[active_component_idx]->create(false);
+    }
     display.display();
 }
 

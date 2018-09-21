@@ -17,10 +17,12 @@
  * 
  * */
 
-void UTGraph::create() {
+void UTGraph::create(boolean show) {
     display->drawFastVLine(1, 1, 50, WHITE);
     display->drawFastHLine(1, 50, 125, WHITE);
-    display->display();
+    
+    if(show)
+        display->display();
 }
 
 XYPos_t UTGraph::getCursorPositionLocation() {
@@ -44,12 +46,12 @@ void UTGraph::changeCursorPosition(uint8_t position) {}
 
 void UTGraph::setCursor(XYPos_t position) {}
 
-void UTGraph::leftPress() {}
+view_t UTGraph::leftPress() {return NONE;}
 
-void UTGraph::rightPress() {}
+view_t UTGraph::rightPress() {return NONE;}
 
-void UTGraph::upPress() {}
+view_t UTGraph::upPress() {return NONE;}
 
-void UTGraph::downPress() {}
+view_t UTGraph::downPress() {return NONE;}
 
-void UTGraph::enterPress() {}
+view_t UTGraph::enterPress() {return NONE;}

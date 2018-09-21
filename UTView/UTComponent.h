@@ -21,7 +21,7 @@
 class UTComponent 
 {
     public:
-        virtual void create();
+        virtual void create(boolean show);
         virtual XYPos_t getCursorPositionLocation();
         virtual XYPos_t getPositionXY(uint8_t position);
 
@@ -33,7 +33,7 @@ class UTComponent
 
         virtual void changeCursorPosition(uint8_t new_position);
 
-        virtual void buttonPress(_input i) {
+        virtual view_t buttonPress(input_t i) {
             switch(i) {
                 case 0:
                     return upPress();
@@ -56,11 +56,11 @@ class UTComponent
         virtual void setCursor(XYPos_t position);
 
         //these are pretty redundant so maybe remove them
-        virtual void leftPress();
-        virtual void rightPress();
-        virtual void upPress();
-        virtual void downPress();
-        virtual void enterPress(); 
+        virtual view_t leftPress();
+        virtual view_t rightPress();
+        virtual view_t upPress();
+        virtual view_t downPress();
+        virtual view_t enterPress(); 
 
     private:       
 

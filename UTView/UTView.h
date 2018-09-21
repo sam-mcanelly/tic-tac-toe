@@ -12,40 +12,38 @@
 
 #include "UTMain.h"
 #include "UTGraph.h"
-//#include <UTPing.h>
+#include "UTMenu.h"
 
 class UTView
 {
     public:
-        UTView() {componentPosition = 0;};
+        UTView() {active_component_idx = 0;};
         void begin();
         bool isRunning();
 
-        void handlePress(_input i);
+        void handlePress(input_t i);
 
     private:
-        uint16_t componentPosition;
-        UTStack<UTComponent*> components();
+        uint8_t active_component_idx;
+        bool running;
+        
         UTMain *main;
         UTGraph *graph;
+        UTMenu *menu;
 
-        UTComponent *view_components[2] = {main, graph};
+        UTComponent *view_components[10];
         UTComponent *active_component;
-        uint8_t active_component_idx = 0;
-        //UTMenu *menu;
-        bool running;
 
         String stop = "stop";
         String microSeconds = "μs";
 
         void showSplashScreen();
 
-        // void handleMainEnterPress();
-        // void handleMenuEnterPress();
-        // void handleDelayEnterPress();
-        // void handleGainEnterPress();
-        // void handleRangeEnterPress();
-        // void handleCalibrateEnterPress();
+        void addView(UTComponent *new_view);
+        void removeTopView();
+        void exitToMainView();
+
+        void redrawAll();
 };
 
 #endif
