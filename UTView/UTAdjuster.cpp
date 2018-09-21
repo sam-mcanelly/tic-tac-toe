@@ -7,6 +7,8 @@
  * 
  ****************************************/
 
+#include <math.h>
+
 #include "UTAdjuster.h"
 
 /*
@@ -148,14 +150,26 @@ view_t UTAdjuster::downPress() {
 }
 
 view_t UTAdjuster::enterPress() {
-    switch(input_cursor_position) {
-        case 0: //
-            //switchView(MENU, 0);
-            break;
-        case 1: //
-            break;
+    if(adjusting) {
+        adjusting = false;
+        display->setTextSize(2);
+        display->setCursor(adjusterDigitPositions[digit_cursor_position].x, adjusterDigitPositions[digit_cursor_position].y);
+        display->setTextColor(WHITE, BLACK);
+        display->println(adjusterDigitStrings[digit_cursor_position]);
+        display->setTextSize(1);
+        changeCursorPosition(input_cursor_position);
+    } else {
+        switch(input_cursor_position) {
+            case 0: //save
+                saveAdjustmentValue();
+                break;
+            case 1: //exit
+                discardAdjustmentValue();
+                return BACK;
+                break;
+        }
     }
-    return BACK;
+    return NONE;
 }
 
 void UTAdjuster::drawAdjusterContainer()
@@ -232,9 +246,28 @@ void UTAdjuster::updateAdjusterDigit(uint8_t digit) {
 }
 
 void UTAdjuster::saveAdjustmentValue() {
+    double result = 0.0;
 
+    for(int i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
+        result += adjustment_value_digits[i];
+        result *= 10;
+    }
+
+    result /= 1000;
+    *adjustment_value = result;
+    Serial.print("Saved adjustment: ");
+    Serial.println(result);
 }
 
 void UTAdjuster::discardAdjustmentValue() {
+    char old_value[ADJUSTMENT_VALUE_DIGIT_COUNT + 1];
+    sprintf(old_value, "%04.0f", *adjustment_value * 100);
 
+    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
+        adjustment_value_digits[i] = (uint8_t)(old_value[i] - 48);
+        Serial.print(adjustment_value_digits[i]);
+    }
+    Serial.println();
+    updateAdjusterDigitStrings();
+    Serial.println(old_value);
 }
