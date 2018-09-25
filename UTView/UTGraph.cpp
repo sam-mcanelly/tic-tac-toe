@@ -19,6 +19,8 @@
 
 void UTGraph::create(boolean show) {
     drawBoundaries();
+    Serial.println("drawing parameters...");
+    //drawParameters();
     //renderCurrentFrame();
 
     if(show)
@@ -33,11 +35,27 @@ void UTGraph::stop() {
     running = false;
 }
 
-void UTGraph::renderCurrentFrame() {
-    display->fillRect(2, 1, 101, 49, BLACK); //clear old data
+void UTGraph::nextFrame(XYPos_t values[100]) {
+    current_frame_idx += 1;
+    if(current_frame_idx > 9) current_frame_idx = 0;
 
-    for(int i = 0; i < 100; i++) {
-        display->drawFastVLine(i+2, 50 - frames[0][i], frames[0][i], WHITE);
+    for(int i = 0; i < 126; i++) {
+        frames[current_frame_idx][i] = values[i];
+    }
+
+    renderCurrentFrame();
+    clearParameterTray();
+    drawParameters();
+}
+
+void UTGraph::renderCurrentFrame() {
+    display->fillRect(2, 0, 128, 49, BLACK); //clear old data
+    double mult_const = 126 / (range - 1.0);
+
+    for(int i = 0; i < 126; i++) {
+        double x_pos = ((frames[current_frame_idx][i].x - offset) - 1.0) * mult_const;
+        if(x_pos > 124 || x_pos < 1) continue;
+        display->drawFastVLine(x_pos+1, 50 - frames[current_frame_idx][i].y, frames[current_frame_idx][i].y, WHITE);
     }
 
     display->display();
@@ -46,17 +64,21 @@ void UTGraph::renderCurrentFrame() {
 void UTGraph::runDemo() {
     delay(100);
     running = true;
-    Serial.println("Running demo...");
+    XYPos_t demo_frames[126];
 
     while(running) {
-        for(int i = 0; i < 100; i++) {
-            frames[0][i] = random(i/2);
+        for(int i = 0; i < 126; i++) {
+            demo_frames[i].x = i;
+            demo_frames[i].y = (i + random(3)) * gain;//random(i/2) * gain;
         }
 
-        renderCurrentFrame();
-        delay(20);
+        nextFrame(demo_frames);
+        
+        delay(10);
         checkButtons();
+        checkPots();
     }
+    clearParameterTray();
 }
 
 XYPos_t UTGraph::getCursorPositionLocation() {
@@ -89,11 +111,27 @@ void UTGraph::checkButtons() {
 
     int input = digitalRead(ENTER_PIN);
     if(input == LOW) {
-        Serial.println("Stopping graph!");
-        delay(400);
-        if(input == LOW)
+        delay(200);
+        if(input == LOW){
             running = false;
+        }
     }
+}
+
+void UTGraph::checkPots() {
+    int gain_val = analogRead(GAIN_PIN);
+    int range_val = analogRead(RANGE_PIN);
+    int offset_val = analogRead(OFFSET_PIN);
+
+    double common_factor = 1 / (1023.0 - 1.0);
+
+    double new_gain = (gain_val - 1.0) * common_factor * adjustment_parameters->_gain;
+    double new_range = (1.0 - ((range_val - 1.0) * common_factor)) * adjustment_parameters->_range;
+    double new_offset = (offset_val - 1.0) * common_factor *  ((adjustment_parameters->_range - new_range)*100);
+  
+    gain = new_gain; 
+    range = new_range * 100; //use centimeters here
+    offset = new_offset < 0 ? 0.0 : new_offset;
 }
 
 view_t UTGraph::leftPress() {return NONE;}
@@ -111,5 +149,26 @@ view_t UTGraph::enterPress() {
 
 void UTGraph::drawBoundaries() {
     display->drawFastVLine(1, 1, 50, WHITE);
-    display->drawFastHLine(1, 50, 101, WHITE);
+    display->drawFastHLine(1, 50, 127, WHITE);
+}
+
+void UTGraph::clearParameterTray() {
+    display->fillRect(1, 54, 127, 10, BLACK);
+}
+
+void UTGraph::drawParameters() {
+    String gain_s = String(gain) + "dB";
+    String range_s = String(range) + "cm";
+    String offset_s = String(offset) + "cm";
+
+    display->setCursor(1, 54);
+    display->setTextColor(WHITE, BLACK);
+    display->println(gain_s);
+
+    
+    display->setCursor(40, 54);
+    display->println(range_s);
+
+    display->setCursor(90, 54);
+    display->println(offset_s);
 }

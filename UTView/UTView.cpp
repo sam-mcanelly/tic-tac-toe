@@ -15,7 +15,7 @@ void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
     //showSplashScreen();
 
-    graph = new UTGraph(&display);
+    graph = new UTGraph(&display, &adjustment_parameters);
     main = new UTMain(&display, graph);
     menu = new UTMenu(&display);
     delay_adjuster = new UTAdjuster(&display,
@@ -82,7 +82,7 @@ void UTView::handlePress(input_t i) {
 void UTView::populateAdjustmentParams() {
     adjustment_parameters._delay = 0.0;
     adjustment_parameters._range = 1.0;
-    adjustment_parameters._gain = 1.0;
+    adjustment_parameters._gain = 3.0;
 
     for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
         adjustment_parameters._delay_digits[i] = 0;
@@ -91,7 +91,7 @@ void UTView::populateAdjustmentParams() {
     }
 
     adjustment_parameters._range_digits[1] = 1;
-    adjustment_parameters._gain_digits[1] = 1;
+    adjustment_parameters._gain_digits[1] = 3;
 }
 
 void UTView::showSplashScreen() {

@@ -25,7 +25,7 @@ UTView view;
 void setup() {
   //start serial for debugging purposes
   Serial.begin(9600);
-
+  
   //initialize inputs
   pinMode(LEFT_PIN, INPUT_PULLUP);
   pinMode(ENTER_PIN, INPUT_PULLUP);
@@ -74,7 +74,6 @@ void checkButtons()
       delay(200); //debounce
       view.handlePress((input_t)i);
     }
-    
   }
 }
 

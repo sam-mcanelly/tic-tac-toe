@@ -21,6 +21,9 @@
 #define UP_PIN 4
 #define RIGHT_PIN 5
 #define DOWN_PIN 6
+#define GAIN_PIN A3
+#define RANGE_PIN A2
+#define OFFSET_PIN A1
 
 #define MAIN_IO_COUNT 3
 #define MENU_IO_COUNT 4
@@ -32,8 +35,8 @@
 
 struct XYPos_t
 {
-    uint16_t x;
-    uint16_t y;
+    double x;
+    double y;
 };
 
 enum view_t

@@ -28,6 +28,7 @@ class UTAdjuster : public UTComponent {
         XYPos_t getPositionXY(uint8_t position);
 
         void changeCursorPosition(uint8_t new_position);
+        void discardAdjustmentValue();
     private:
         String units;
         double *adjustment_value;
@@ -73,7 +74,6 @@ class UTAdjuster : public UTComponent {
         void updateAdjusterDigit(uint8_t digit);
 
         void saveAdjustmentValue();
-        void discardAdjustmentValue();
 };
 
 #endif

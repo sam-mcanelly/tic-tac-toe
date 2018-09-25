@@ -133,6 +133,10 @@ view_t UTMain::enterPress() {
             break;
         case 2: //pause
             graph->stop();
+            Serial.println("Redrawing main buttons...");
+            drawMainViewButtons();
+            changeCursorPosition(1);
+            display->display();
             break;
     }
 
