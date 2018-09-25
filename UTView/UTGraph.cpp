@@ -50,12 +50,12 @@ void UTGraph::nextFrame(XYPos_t values[100]) {
 
 void UTGraph::renderCurrentFrame() {
     display->fillRect(2, 0, 128, 49, BLACK); //clear old data
-    double mult_const = 126 / (range - 1.0);
+    double mult_const = 126.0 / (range - 1.0);
 
     for(int i = 0; i < 126; i++) {
         double x_pos = ((frames[current_frame_idx][i].x - offset) - 1.0) * mult_const;
         if(x_pos > 124 || x_pos < 1) continue;
-        display->drawFastVLine(x_pos+1, 50 - frames[current_frame_idx][i].y, frames[current_frame_idx][i].y, WHITE);
+        display->drawFastVLine(x_pos+1, 51 - frames[current_frame_idx][i].y, frames[current_frame_idx][i].y, WHITE);
     }
 
     display->display();
@@ -67,9 +67,9 @@ void UTGraph::runDemo() {
     XYPos_t demo_frames[126];
 
     while(running) {
-        for(int i = 0; i < 126; i++) {
-            demo_frames[i].x = i;
-            demo_frames[i].y = (i + random(3)) * gain;//random(i/2) * gain;
+        for(double i = 0; i < 126.0; i += 1.0) {
+            demo_frames[(int)i].x = i / 4;
+            demo_frames[(int)i].y = (exp(-1.0*(i/20))*(sin(i) + 1) * 50.0) * gain + random(2);//random(i/2) * gain;
         }
 
         nextFrame(demo_frames);
@@ -158,17 +158,17 @@ void UTGraph::clearParameterTray() {
 
 void UTGraph::drawParameters() {
     String gain_s = String(gain) + "dB";
-    String range_s = String(range) + "cm";
-    String offset_s = String(offset) + "cm";
+    String range_s = String(range/100) + "m";
+    String offset_s = String(offset/100) + "m";
 
     display->setCursor(1, 54);
     display->setTextColor(WHITE, BLACK);
     display->println(gain_s);
 
     
-    display->setCursor(40, 54);
+    display->setCursor(50, 54);
     display->println(range_s);
 
-    display->setCursor(90, 54);
+    display->setCursor(95, 54);
     display->println(offset_s);
 }

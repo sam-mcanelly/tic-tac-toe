@@ -10,6 +10,7 @@
 #ifndef UTGraph_h
 #define UTGraph_h
 
+#include <math.h>
 #include "UTComponent.h"
 
 class UTGraph : public UTComponent {
