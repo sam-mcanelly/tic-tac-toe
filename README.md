@@ -11,6 +11,7 @@ To-Do List
 - Add Graph pause and inspection of last n frames
 - Add UTPing object and determine where it will live
   and be passed around
+- Store settings in EEPROM using https://www.pjrc.com/teensy/td_libs_EEPROM.html
 
 ### UTPing
 - Add API for generating a signal manually
