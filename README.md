@@ -4,9 +4,7 @@ tic-tac-toe
 To-Do List
 ----------
 
-            *-------------------*
-            |      UTView       |
-            *-------------------*
+### UTView
 - Add UTTray for rendering the bottom buttons/parameters
 - Optimize graph states and state transitions
 - Add Point,Line, and Magnitude to Graph
@@ -14,9 +12,7 @@ To-Do List
 - Add UTPing object and determine where it will live
   and be passed around
 
-          *-------------------*
-          |      UTPing       |
-          *-------------------*
+### UTPing
 - Add API for generating a signal manually
 - Add API for generating a singal through the line driver
 - Add ADC conversion for transducer input
@@ -33,8 +29,8 @@ Usage
 - Compatibility : Currently only tested on Teensy 3.1/3.2
 - First, ensure the teensyduino helper is installed : https://www.pjrc.com/teensy/td_download.html
 - To use the provided libraries, copy UTView and UTPing into the following directory
-  /Applications/Arduino.app/Contents/Java/hardware/teensy/avr/libraries -> Mac
-  C:\Program Files (x86)\Arduino\hardware\teensy\avr\libraries -> Windows
+  - /Applications/Arduino.app/Contents/Java/hardware/teensy/avr/libraries -> Mac
+  - C:\Program Files (x86)\Arduino\hardware\teensy\avr\libraries -> Windows
 - Button and potentiometer outputs/inputs are defined in UTTypes.h as well as the OLED address
 
 - Definitions from UTTypes.h
