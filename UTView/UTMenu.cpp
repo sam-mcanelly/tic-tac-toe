@@ -35,11 +35,9 @@ XYPos_t UTMenu::getPositionXY(uint8_t position) {
 }
 
 void UTMenu::changeCursorPosition(uint8_t new_position) {
+    //check bounds
     if(new_position == MENU_IO_COUNT) new_position = 0;
     else if(new_position < 0) new_position = MENU_IO_COUNT - 1;
-
-    Serial.print("new cursor position:");
-    Serial.println(new_position);
 
     display->setCursor(menuInputPositions[input_cursor_position].x, menuInputPositions[input_cursor_position].y);
     display->setTextColor(WHITE, BLACK);

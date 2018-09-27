@@ -63,11 +63,6 @@ class UTView
         UTComponent *view_components[10];
         UTComponent *active_component;
 
-        String stop = "stop";
-        String micro_seconds = "uS";//"μs";
-        String meters = "m";
-        String decibal = "dB";
-
         void showSplashScreen();
 
         void populateAdjustmentParams();

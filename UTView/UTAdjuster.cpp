@@ -6,7 +6,6 @@
  * ECEN 4013
  * 
  ****************************************/
-
 #include <math.h>
 
 #include "UTAdjuster.h"
@@ -59,7 +58,6 @@ void UTAdjuster::changeCursorPosition(uint8_t new_position) {
         if(new_position == ADJUSTMENT_VALUE_DIGIT_COUNT) new_position = 0;
         else if(new_position < 0) new_position = ADJUSTMENT_VALUE_DIGIT_COUNT - 1;
     } else {
-        Serial.println("Not adjusting...");
         positions = adjusterInputPositions;
         cursor_position = &input_cursor_position;
         display_strings = adjusterViewStrings;
@@ -68,10 +66,6 @@ void UTAdjuster::changeCursorPosition(uint8_t new_position) {
         if(new_position == ADJUSTMENT_IO_COUNT) new_position = 0;
         else if(new_position < 0) new_position = ADJUSTMENT_IO_COUNT - 1;
     }
-
-
-    Serial.print("new cursor position:");
-    Serial.println(new_position);
 
     display->setCursor(positions[*cursor_position].x, positions[*cursor_position].y);
     display->setTextColor(WHITE, BLACK);
@@ -90,11 +84,8 @@ void UTAdjuster::discardAdjustmentValue() {
 
     for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
         adjustment_value_digits[i] = (uint8_t)(old_value[i] - 48);
-        Serial.print(adjustment_value_digits[i]);
     }
-    Serial.println();
     updateAdjusterDigitStrings();
-    Serial.println(old_value);
 }
 
 /*
@@ -205,7 +196,6 @@ void UTAdjuster::drawAdjusterButtons() {
 }
 
 void UTAdjuster::drawAdjusterDigits() {
-    Serial.println("Drawing digits...");
     display->setTextColor(WHITE, BLACK);
     display->setTextSize(2);
 
@@ -269,8 +259,6 @@ void UTAdjuster::saveAdjustmentValue() {
 
     result /= 1000;
     *adjustment_value = result;
-    Serial.print("Saved adjustment: ");
-    Serial.println(result);
 
     display->fillRect(24, 34, 4, 4, WHITE);
     display->display();

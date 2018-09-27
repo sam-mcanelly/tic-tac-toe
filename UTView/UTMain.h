@@ -41,11 +41,11 @@ class UTMain : public UTComponent {
         //main screen input positions
         XYPos_t menuPosition = {1, 54};
         XYPos_t startPosition = {45, 54};
-        XYPos_t pausePosition = {95, 54};
+        XYPos_t exportPosition = {90, 54};
 
-        XYPos_t mainInputPositions[MAIN_IO_COUNT] = {menuPosition, startPosition, pausePosition};
+        XYPos_t mainInputPositions[MAIN_IO_COUNT] = {menuPosition, startPosition, exportPosition};
 
-        String mainViewStrings[MAIN_IO_COUNT] = {"menu", "start", "pause"};
+        String mainViewStrings[MAIN_IO_COUNT] = {"menu", "start", "export"};
 
         void setCursor(XYPos_t position);
 

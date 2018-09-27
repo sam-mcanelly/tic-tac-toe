@@ -81,7 +81,7 @@ void UTView::handlePress(input_t i) {
 
 void UTView::populateAdjustmentParams() {
     adjustment_parameters._delay = 0.0;
-    adjustment_parameters._range = 1.0;
+    adjustment_parameters._range = 0.05;
     adjustment_parameters._gain = 3.0;
 
     for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {

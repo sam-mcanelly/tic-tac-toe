@@ -8,9 +8,8 @@
  ****************************************/
 
 #ifndef UTGraph_h
-#define UTGraph_h
+#define UTGraph_h 
 
-#include <math.h>
 #include "UTComponent.h"
 
 class UTGraph : public UTComponent {
@@ -19,6 +18,7 @@ class UTGraph : public UTComponent {
             display = _display;
             adjustment_parameters = _parameters;
             running = false;
+            inspecting = false;
             gain = 1.0;
             range = 1.0;
 
@@ -35,6 +35,7 @@ class UTGraph : public UTComponent {
 
         void nextFrame(XYPos_t values[100]);
         void renderCurrentFrame();
+        void exportToSerial();
         void runDemo();
 
         XYPos_t getCursorPositionLocation();
@@ -46,19 +47,31 @@ class UTGraph : public UTComponent {
         boolean isRunning();
     private:
         boolean running;
-        XYPos_t frames[10][126];
+        boolean inspecting;
+
         int current_frame_idx = 0;
+
         double gain;
         double range;
         double offset;
+        double inspect;
+        double inspect_x;
+        double inspect_y;
 
+        XYPos_t frames[10][126];
+
+        //canvas_data[0] is x,y coordinates of top left corner
+        //canvas_data[1] is width and height of canvas
+        XYPos_t canvas_data[2] = {{1, 0},{128, 50}};
+
+        //bottom tray position data 
         XYPos_t gain_position = {1, 54};
-        XYPos_t range_position = {40, 54};
-        XYPos_t offset_position = {90, 54};
+        XYPos_t distance_range_position = {45, 54};
+        XYPos_t magnitude_offset_position = {90, 54};
 
         adjustment_params_t *adjustment_parameters;
 
-        void checkButtons();
+        void checkButtonsWhileRunning();
         void checkPots();
 
         view_t leftPress();
@@ -68,8 +81,10 @@ class UTGraph : public UTComponent {
         view_t enterPress(); 
 
         void drawBoundaries(); 
+        void clearGraph();
         void clearParameterTray();
         void drawParameters();
+        void drawInspectionPointer();
 };
 
 #endif
