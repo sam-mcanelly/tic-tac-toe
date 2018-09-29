@@ -10,8 +10,6 @@
 #ifndef UTGraph_h
 #define UTGraph_h 
 
-#define DEBUGGING_MODE true
-
 #include "UTComponent.h"
 
 class UTGraph : public UTComponent {

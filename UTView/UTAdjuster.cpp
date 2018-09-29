@@ -6,6 +6,7 @@
  * ECEN 4013
  * 
  ****************************************/
+#include <EEPROM.h>
 #include <math.h>
 
 #include "UTAdjuster.h"
@@ -262,6 +263,14 @@ void UTAdjuster::saveAdjustmentValue() {
 
     display->fillRect(24, 34, 4, 4, WHITE);
     display->display();
+    EEPROM.write(EEPROM_save_start, result);
+    float saved_val = (float)EEPROM.read(EEPROM_save_start);
+
+    #if(DEBUGGING_MODE == true)
+        Serial.print("Persisted value in EEPROM: ");
+        Serial.println(saved_val);
+    #endif
+
     delay(200);
     display->fillRect(24, 34, 4, 4, BLACK);
     display->display();

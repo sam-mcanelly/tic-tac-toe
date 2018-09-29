@@ -34,6 +34,7 @@ class UTView
         };
 
         ~UTView() {
+            Serial.println("destructing view...");
             delete graph;
             delete main;
             delete menu;

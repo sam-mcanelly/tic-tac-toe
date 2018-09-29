@@ -121,7 +121,6 @@ view_t UTMain::enterPress() {
             if(!graph->isActive()) {
                 graph->runDemo();
             } else {
-                Serial.println("exiting graph..");
                 graph->exit();
                 display->fillRect(0, 51, 128, 13, BLACK);
                 drawMainViewButtons();

@@ -39,6 +39,12 @@
 
 #define MEASURMENT_VALUE_LENGTH 7
 
+#define DELAY_EEPROM_START 1
+#define GAIN_EEPROM_START 5
+#define RANGE_EEPROM_START 9
+
+#define DEBUGGING_MODE true
+
 #include "Arduino.h"
 
 const String micro_seconds = "uS";//"μs";

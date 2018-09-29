@@ -21,15 +21,18 @@ void UTView::begin() {
     delay_adjuster = new UTAdjuster(&display,
                                     &adjustment_parameters._delay,
                                     adjustment_parameters._delay_digits,
-                                    micro_seconds);
+                                    micro_seconds,
+                                    DELAY_EEPROM_START);
     gain_adjuster = new UTAdjuster(&display,
                                     &adjustment_parameters._gain,
                                     adjustment_parameters._gain_digits,
-                                    decibal);
+                                    decibal,
+                                    GAIN_EEPROM_START);
     range_adjuster = new UTAdjuster(&display,
                                     &adjustment_parameters._range,
                                     adjustment_parameters._range_digits,
-                                    meters);
+                                    meters,
+                                    RANGE_EEPROM_START);
 
 
     view_components[0] = main;
@@ -49,49 +52,42 @@ void UTView::handlePress(input_t i) {
         case NONE:
             return;
         case BACK:
-            Serial.println("Moving back a view...");
             removeTopView();
             return;
         case MENU:
-            Serial.println("Switching to Menu view...");
             addView(menu);
             return;
         case MAIN:
-            Serial.println("Switching to Main view...");
             exitToMainView();
             return;
         case DELAY:
-            Serial.println("Opening Delay Adjuster...");
             addView(delay_adjuster);
             return;
         case GAIN:
-            Serial.println("Opening Gain Adjuster...");
             addView(gain_adjuster);
             return;
         case RANGE:
-            Serial.println("Opening Range Adjuster...");
             addView(range_adjuster);
             return;
         case CALIBRATE:
-            Serial.println("Opening Calibration tool...");
             return;
           
     }
 }
 
 void UTView::populateAdjustmentParams() {
-    adjustment_parameters._delay = 0.0;
-    adjustment_parameters._range = 1.0;
-    adjustment_parameters._gain = 3.0;
+    adjustment_parameters._delay = (float)EEPROM.read(DELAY_EEPROM_START);
+    adjustment_parameters._range = (float)EEPROM.read(RANGE_EEPROM_START);
+    adjustment_parameters._gain = (float)EEPROM.read(GAIN_EEPROM_START);
 
-    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
-        adjustment_parameters._delay_digits[i] = 0;
-        adjustment_parameters._range_digits[i] = 0;
-        adjustment_parameters._gain_digits[i] = 0;
-    }
-
-    adjustment_parameters._range_digits[1] = 1;
-    adjustment_parameters._gain_digits[1] = 3;
+    #if(DEBUGGING_MODE == true)
+        Serial.print("Loaded delay from EEPROM: ");
+        Serial.println(adjustment_parameters._delay);
+        Serial.print("Loaded gain from EEPROM: ");
+        Serial.println(adjustment_parameters._gain);
+        Serial.print("Loaded range from EEPROM: ");
+        Serial.println(adjustment_parameters._range);
+    #endif
 }
 
 void UTView::showSplashScreen() {
@@ -114,7 +110,11 @@ void UTView::addView(UTComponent *new_view) {
     //check for out of bounds
     active_component_idx++;
     if(active_component_idx > MAX_COMPONENT_IDX) {
-        Serial.println("ERROR - UI component stack size limit reached!");
+
+        #if(DEBUGGING_MODE == true)
+            Serial.println("ERROR - UI component stack size limit reached!");
+        #endif
+
         active_component_idx--;
         return;
     }
@@ -126,7 +126,11 @@ void UTView::addView(UTComponent *new_view) {
 
 void UTView::removeTopView() {
     if(active_component_idx == 0) {
-        Serial.println("ERROR - Trying to delete main view... aborting");
+
+        #if(DEBUGGING_MODE == true)
+            Serial.println("ERROR - Trying to delete main view... aborting");
+        #endif
+
         return;
     }
 

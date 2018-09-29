@@ -14,10 +14,16 @@
 
 class UTAdjuster : public UTComponent {
     public:
-        UTAdjuster(Adafruit_SSD1306 *_display, float *val, uint8_t digits[ADJUSTMENT_VALUE_DIGIT_COUNT], String _units){
+        UTAdjuster(Adafruit_SSD1306 *_display, 
+                   float *val, 
+                   uint8_t digits[ADJUSTMENT_VALUE_DIGIT_COUNT], 
+                   String _units,
+                   int _EEPROM_save_start){
+
             display = _display;
             adjustment_value = val;
             adjustment_value_digits = digits;
+            EEPROM_save_start = _EEPROM_save_start;
             units = _units;
             adjusting = false;
             digit_cursor_position = 0;
@@ -34,6 +40,8 @@ class UTAdjuster : public UTComponent {
         uint8_t *adjustment_value_digits;
         uint8_t digit_cursor_position;
         boolean adjusting;
+
+        int EEPROM_save_start;
 
         //adjuster screen input positions
         XYPos_t save_position = {42, 32};
