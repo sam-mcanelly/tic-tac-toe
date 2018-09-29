@@ -78,16 +78,6 @@ void UTAdjuster::changeCursorPosition(uint8_t new_position) {
     display->setTextSize(1);
 }
 
-void UTAdjuster::discardAdjustmentValue() {
-    char old_value[ADJUSTMENT_VALUE_DIGIT_COUNT + 1];
-    sprintf(old_value, "%04.0f", *adjustment_value * 100);
-
-    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
-        adjustment_value_digits[i] = (uint8_t)(old_value[i] - 48);
-    }
-    updateAdjusterDigitStrings();
-}
-
 /*
  * 
  * 
@@ -249,8 +239,18 @@ void UTAdjuster::updateAdjusterDigit(uint8_t digit) {
     display->setTextSize(1);
 }
 
+void UTAdjuster::discardAdjustmentValue() {
+    char old_value[ADJUSTMENT_VALUE_DIGIT_COUNT + 1];
+    sprintf(old_value, "%04.0f", *adjustment_value * 100);
+
+    for(uint8_t i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
+        adjustment_value_digits[i] = (uint8_t)(old_value[i] - 48);
+    }
+    updateAdjusterDigitStrings();
+}
+
 void UTAdjuster::saveAdjustmentValue() {
-    double result = 0.0;
+    float result = 0.0;
 
     for(int i = 0; i < ADJUSTMENT_VALUE_DIGIT_COUNT; i++) {
         result += adjustment_value_digits[i];

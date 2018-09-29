@@ -34,6 +34,11 @@
 #define ADJUSTMENT_STRING_COUNT 2
 #define ADJUSTMENT_VALUE_DIGIT_COUNT 4
 
+#define FRAME_POINT_COUNT 100
+#define FRAME_STORAGE_COUNT 30
+
+#define MEASURMENT_VALUE_LENGTH 7
+
 #include "Arduino.h"
 
 const String micro_seconds = "uS";//"μs";
@@ -43,8 +48,8 @@ const String decibal = "dB";
 
 struct XYPos_t
 {
-    double x;
-    double y;
+    uint16_t x;
+    uint16_t y;
 };
 
 enum view_t
@@ -68,11 +73,18 @@ enum input_t
     ENTER
 };
 
+enum graph_state_t
+{
+    NORMAL,
+    INSPECT,
+    REPLAY
+};
+
 struct adjustment_params_t 
 {
-    double _delay;
-    double _gain;
-    double _range;
+    float _delay;
+    float _gain;
+    float _range;
 
     uint8_t _delay_digits[4];
     uint8_t _gain_digits[4];

@@ -31,19 +31,11 @@ void UTMain::showGraph() {
 }
 
 XYPos_t UTMain::getCursorPositionLocation() {
-    if(!graphActive) {
-        return mainInputPositions[input_cursor_position];
-    } else {
-        return {0, 0};
-    }
+    return mainInputPositions[input_cursor_position];
 }
 
 XYPos_t UTMain::getPositionXY(uint8_t position) {
-    if(!graphActive) {
-        return mainInputPositions[position];
-    } else {
-        return {0, 0};
-    }
+    return mainInputPositions[position];
 }
 
 void UTMain::changeCursorPosition(uint8_t new_position) {
@@ -60,6 +52,8 @@ void UTMain::changeCursorPosition(uint8_t new_position) {
 }
 
 view_t UTMain::buttonPress(input_t i) {
+    //if(graph->isActive()) return;
+
     switch(i) {
         case 0:
             return upPress();
@@ -118,16 +112,26 @@ view_t UTMain::enterPress() {
         case 0: //menu
             return MENU;
             break;
+
+        //This one is really weird...
+        //The interrupt gets re-mapped to the right button
+        //when the graph is running.
+        //right exits the graph
         case 1: //start
-            changeCursorPosition(2);
-            if(graph->isRunning())
-            graph->runDemo();
+            if(!graph->isActive()) {
+                graph->runDemo();
+            } else {
+                Serial.println("exiting graph..");
+                graph->exit();
+                display->fillRect(0, 51, 128, 13, BLACK);
+                drawMainViewButtons();
+
+                //this handles the double enter/right press bug
+                input_cursor_position -= 1;
+            }
             break;
         case 2: //export
-            Serial.println("enter press on main...");
-            drawMainViewButtons();
-            changeCursorPosition(2);
-            display->display();
+            graph->exportToSerial();
             break;
     }
 

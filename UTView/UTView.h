@@ -12,8 +12,10 @@
 
 #include "Arduino.h"
 
-#include <Wire.h>
+#include <EEPROM.h>
 #include <SPI.h>
+#include <Wire.h>
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
@@ -28,7 +30,6 @@ class UTView
     public:
         UTView() {
             active_component_idx = 0;
-            override_pot_values = false;
             populateAdjustmentParams();
         };
 
@@ -49,7 +50,6 @@ class UTView
 
     private:
         uint8_t active_component_idx;
-        boolean override_pot_values;
 
         adjustment_params_t adjustment_parameters;
         

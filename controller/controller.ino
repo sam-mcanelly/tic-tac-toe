@@ -46,9 +46,6 @@ void loop() {
   {
     checkButtons();
   }
-
-  
-
 }
 
 void handleEnterPress()
@@ -58,7 +55,6 @@ void handleEnterPress()
   unsigned long interrupt_time = millis();
   if (interrupt_time - last_interrupt_time > 300) 
   {
-    Serial.println("Enter pressed!");
     view.handlePress((input_t)4); //enter's position in the array 
   }
   last_interrupt_time = interrupt_time;
