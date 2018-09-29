@@ -9,6 +9,7 @@ To-Do List
 - Optimize graph states and state transitions
 - Add Point,Line, and Magnitude to Graph
 - Add Graph pause and inspection of last n frames
+- Optimize graph rendering by pre-computing x value boundaries
 - Add UTPing object and determine where it will live
   and be passed around
 
