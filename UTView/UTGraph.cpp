@@ -167,16 +167,29 @@ void UTGraph::runDemo() {
 
     // Mocks UTPing's functionality
     while(running) {
+        #if (DEBUGGING_MODE == true)
+            //unsigned long start_millis = millis();
+        #endif
+
         for(int i = 0; i < FRAME_POINT_COUNT; i += 1) {
             //experiment with this delay to determine max time to 
             //gather data from transducer
             //delay(100);
-            //float normalized = ((i - lower_bound + 0.0) / (upper_bound - lower_bound + 0.0)) * 127;
             demo_frames[i].x = i*10.0;
             demo_frames[i].y = uint16_t(exp(-(i/50.0))*(sin(i) + 1.0) * 20.0) * gain + random(2);//(uint16_t)((sin(i) + 1) * (gain * 10) + random(2));
         }
+        delay(20);
 
+        #if(DEBUGGING_MODE == true)
+            //unsigned long frame_gen_time = millis() - start_millis;
+            //Serial.print("Time to generate one frame: ");
+            //Serial.print(frame_gen_time);
+            //Serial.println("ms");
+        #endif
+        
         nextFrame(demo_frames);
+
+        ping->readSignal();
     }
 }
 
@@ -266,12 +279,9 @@ void UTGraph::clearGraph() {
 
 //move this to UTTray
 void UTGraph::drawParameterTray() {
-    display->fillRect(1, 54, 127, 10, BLACK);
-    display->drawFastVLine(0, 50, 14, WHITE);
+    display->fillRect(1, 53, 126, 10, BLACK);
     display->drawFastVLine(38, 50, 14, WHITE);
     display->drawFastVLine(83, 50, 14, WHITE);
-    display->drawFastVLine(127, 50, 14, WHITE);
-    display->drawFastHLine(0, 63, 128, WHITE);
 }
 
 void UTGraph::drawParameters() {

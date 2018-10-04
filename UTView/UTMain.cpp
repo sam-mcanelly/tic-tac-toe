@@ -138,6 +138,11 @@ view_t UTMain::enterPress() {
 }
 
 void UTMain::drawMainViewButtons() {
+    //draw borders
+    display->drawFastVLine(127, 50, 14, WHITE);
+    display->drawFastVLine(0, 50, 14, WHITE);
+    display->drawFastHLine(0, 63, 128, WHITE);
+
     display->setTextColor(WHITE, BLACK);
 
     for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {

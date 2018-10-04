@@ -1,68 +1,46 @@
 #include "UTPing.h"
 
-UTPing::Ping(int outputPin, int inputPin)
-{
-  pinMode(outputPin, OUTPUT);
-  pinMode(inputPin, INPUT)
-  _outputPin = outputPin;
-  _inputPin = inputPin;
-  _in = 0;
-  _cm = 0;
-  _duration = -1;
-}
-
-UTPing::Ping(int outputPin, int inputPin, double in, double cm)
-{
-  pinMode(pin, OUTPUT);
-  _outputPin = outputPin;
-  _inputPin = inputPin;
-  _in = in;
-  _cm = cm;
-  _duration = -1;
-  _startDelay = 1;
-  _pulseDelay = 0.2;
-}
-
-void UTPing::fire()
-{
-  digitalWrite(_outputPin, LOW);
-  delayMicroseconds(_startDelay);
-  digitalWrite(_outputPin, HIGH);
-  delayMicroseconds(_pulseDelay);
-  digitalWrite(_outputPin, LOW);
-  _duration = pulseIn(_inputPin, HIGH);
+void UTPing::fire() {
+  digitalWrite(output_pin, LOW);
+  delayMicroseconds(start_delay);
+  digitalWrite(output_pin, HIGH);
+  delayMicroseconds(pulse_delay);
+  digitalWrite(output_pin, LOW);
+  long duration = pulseIn(input_pin, HIGH);
   
 }
 
-int UTPing::microseconds()
-{
-  return _duration;
+void UTPing::setStartDelay(double delay) {
+  start_delay = delay;
 }
 
-double UTPing::inches()
-{
-  if(_duration != -1){
-    return _duration / (74+_in) / 2;
+void UTPing::setPulseDelay(double delay) {
+  pulse_delay = delay;
+}
+
+//THIS NEEDS TO BE CHANGED 
+//IT WON'T WORK IN ITS CURRENT
+//STATE
+int UTPing::millimeters(long duration) {
+  if(duration != -1){
+    return (int)((duration / (29+mm) / 2) * 10);
   }else{
     return -1;
   }
 }
 
-double UTPing::centimeters()
-{
-  if(_duration != -1){
-    return _duration / (29+_cm) / 2;
-  }else{
-    return -1;
+//test function for reading signals
+void UTPing::readSignal() {
+  int value[100];  
+
+  for(int i = 0; i < 100; i++) {
+    value[i] = adc->analogRead(A9, ADC_0);
   }
-}
 
-void UTPing::setPulseDelay(double delay)
-{
-  _pulseDelay = delay;
-}
-
-void UTPing::setStartDelay(double delay)
-{
-  _startDelay = delay;
+  for(int i = 0; i < 100; i++) {
+    Serial.print(value[i]);
+    Serial.print(", ");
+  }
+  Serial.println();
+  adc->printError();
 }

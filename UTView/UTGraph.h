@@ -11,6 +11,7 @@
 #define UTGraph_h 
 
 #include "UTComponent.h"
+#include <UTPing.h>
 
 class UTGraph : public UTComponent {
     public:
@@ -30,6 +31,8 @@ class UTGraph : public UTComponent {
                     frames[i][j].y = 0;
                 }
             }
+
+            ping = new UTPing(A9, A8, 0);
         };
 
         void create(boolean show);
@@ -50,6 +53,8 @@ class UTGraph : public UTComponent {
         boolean isActive();
         boolean isRunning();
     private:
+        UTPing *ping;
+
         boolean running;
         boolean inspecting;
         boolean active;

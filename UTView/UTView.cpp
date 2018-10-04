@@ -13,7 +13,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 
 void UTView::begin() {
     display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
-    //showSplashScreen();
+    showSplashScreen();
 
     graph = new UTGraph(&display, &adjustment_parameters);
     main = new UTMain(&display, graph);
@@ -100,7 +100,7 @@ void UTView::showSplashScreen() {
     display.display(); // show splashscreen
     delay(1000);
     display.startscrollleft(0x00, 0x0F);
-    delay(8000);
+    delay(2000);
     display.stopscroll();
     display.clearDisplay();   // clears the screen and buffer
     display.display();

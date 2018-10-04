@@ -39,9 +39,9 @@ class UTMain : public UTComponent {
         boolean graphActive; //are we currently interfacing with the graph?
 
         //main screen input positions
-        XYPos_t menuPosition = {1, 54};
-        XYPos_t startPosition = {45, 54};
-        XYPos_t exportPosition = {90, 54};
+        XYPos_t menuPosition = {2, 53};
+        XYPos_t startPosition = {45, 53};
+        XYPos_t exportPosition = {89, 53};
 
         XYPos_t mainInputPositions[MAIN_IO_COUNT] = {menuPosition, startPosition, exportPosition};
 
