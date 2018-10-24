@@ -15,8 +15,10 @@
 
 class UTGraph : public UTComponent {
     public:
-        UTGraph(Adafruit_SSD1306 *_display, adjustment_params_t * _parameters) {
+        UTGraph(UTDisplayWrapper<DISPLAY_TYPE_CLASS> *_display, adjustment_params_t * _parameters) {
+            
             display = _display;
+
             adjustment_parameters = _parameters;
             running = false;
             inspecting = false;
@@ -32,7 +34,7 @@ class UTGraph : public UTComponent {
                 }
             }
 
-            ping = new UTPing(A9, A8, 0);
+            ping = new UTPing(A8, A9, 0);
         };
 
         void create(boolean show);
@@ -83,12 +85,25 @@ class UTGraph : public UTComponent {
 
         //canvas_data[0] is x,y coordinates of top left corner
         //canvas_data[1] is width and height of canvas
-        XYPos_t canvas_data[2] = {{1, 0},{128, 50}};
+        #if(DISPLAY_TYPE == SSD_1306)
+            XYPos_t canvas_data[2] = {{1, 0},{128, 50}};
+        #elif(DISPLAY_TYPE == ST_7735)
+            XYPos_t canvas_data[2] = {{1, 0},{160, 70}};
+        #endif
 
         //bottom tray position data 
-        XYPos_t gain_position = {2, 54};
-        XYPos_t distance_range_position = {40, 54};
-        XYPos_t magnitude_offset_position = {85, 54};
+        #if(DISPLAY_TYPE == SSD_1306)
+            XYPos_t gain_position = {2, 54};
+            XYPos_t distance_range_position = {40, 54};
+            XYPos_t magnitude_offset_position = {85, 54};
+        #elif(DISPLAY_TYPE == ST_7735)
+            XYPos_t gain_position = {80, 84};
+            XYPos_t range_position = {80, 94};
+            XYPos_t offset_position = {80, 104};
+
+            XYPos_t distance_position = {55, 73};
+            XYPos_t magnitude_position = {125, 73};
+        #endif
 
         adjustment_params_t *adjustment_parameters;
 

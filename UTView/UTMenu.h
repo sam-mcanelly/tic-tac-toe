@@ -15,7 +15,7 @@
 
 class UTMenu : public UTComponent {
     public:
-        UTMenu(Adafruit_SSD1306 *_display){
+        UTMenu(UTDisplayWrapper<DISPLAY_TYPE_CLASS> *_display){
             display = _display;
         }
 
@@ -26,12 +26,18 @@ class UTMenu : public UTComponent {
         void changeCursorPosition(uint8_t new_position);
     private:
 
-
         //menu screen input positions
-        XYPos_t delayPosition = {2, 12};
-        XYPos_t gainPosition = {2, 22};
-        XYPos_t rangePosition = {2, 32};
-        XYPos_t calibratePosition = {2, 42};
+        #if(DISPLAY_TYPE == SSD_1306)
+            XYPos_t delayPosition = {2, 12};
+            XYPos_t gainPosition = {2, 22};
+            XYPos_t rangePosition = {2, 32};
+            XYPos_t calibratePosition = {2, 42};
+        #elif(DISPLAY_TYPE == ST_7735)
+            XYPos_t delayPosition = {47, 17};
+            XYPos_t gainPosition = {47, 27};
+            XYPos_t rangePosition = {47, 37};
+            XYPos_t calibratePosition = {47, 47};
+        #endif
 
         XYPos_t menuInputPositions[MENU_IO_COUNT] = {delayPosition, gainPosition, rangePosition, calibratePosition};
         String menuViewStrings[MENU_IO_COUNT] = {"delay", "gain", "range", "calibration"};

@@ -43,9 +43,17 @@ void UTMain::changeCursorPosition(uint8_t new_position) {
     if(new_position == MAIN_IO_COUNT) new_position = 0;
     else if(new_position < 0) new_position = MAIN_IO_COUNT - 1;
 
-    display->setCursor(mainInputPositions[input_cursor_position].x, mainInputPositions[input_cursor_position].y);
-    display->setTextColor(WHITE, BLACK);
-    display->println(mainViewStrings[input_cursor_position]);
+    //unselect previous button
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->setCursor(mainInputPositions[input_cursor_position].x, mainInputPositions[input_cursor_position].y);
+        display->setTextColor(_WHITE, _BLACK);
+        display->println(mainViewStrings[input_cursor_position]);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->deselectButton(mainInputPositions[input_cursor_position].x,
+                            mainInputPositions[input_cursor_position].y,
+                            mainViewStrings[input_cursor_position],
+                            SMALL);
+    #endif
     input_cursor_position = new_position;
     setCursor(getCursorPositionLocation());
     display->display();
@@ -79,10 +87,15 @@ view_t UTMain::buttonPress(input_t i) {
  * */
 
 void UTMain::setCursor(XYPos_t position) {
-    //sets cursor to draw, not input cursor
-    display->setCursor(position.x, position.y);
-    display->setTextColor(BLACK, WHITE);
-    display->println(mainViewStrings[input_cursor_position]);
+    #if(DISPLAY_TYPE == SSD_1306)
+        //sets cursor to draw, not input cursor
+        display->setCursor(position.x, position.y);
+
+        display->setTextColor(_BLACK, _WHITE);
+        display->println(mainViewStrings[input_cursor_position]);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->selectButton(position.x, position.y, mainViewStrings[input_cursor_position], SMALL);
+    #endif
 }
 
 view_t UTMain::leftPress() {
@@ -122,7 +135,11 @@ view_t UTMain::enterPress() {
                 graph->runDemo();
             } else {
                 graph->exit();
-                display->fillRect(0, 51, 128, 13, BLACK);
+                #if(DISPLAY_TYPE == SSD_1306)
+                    display->fillRect(0, 51, 128, 13, _BLACK);
+                #elif(DISPLAY_TYPE == ST_7735)
+
+                #endif
                 drawMainViewButtons();
 
                 //this handles the double enter/right press bug
@@ -138,15 +155,21 @@ view_t UTMain::enterPress() {
 }
 
 void UTMain::drawMainViewButtons() {
-    //draw borders
-    display->drawFastVLine(127, 50, 14, WHITE);
-    display->drawFastVLine(0, 50, 14, WHITE);
-    display->drawFastHLine(0, 63, 128, WHITE);
+    #if(DISPLAY_TYPE == SSD_1306)
+        //draw borders
+        display->drawFastVLine(127, 50, 14, _WHITE);
+        display->drawFastVLine(0, 50, 14, _WHITE);
+        display->drawFastHLine(0, 63, CANVAS_WIDTH, _WHITE);
 
-    display->setTextColor(WHITE, BLACK);
+        display->setTextColor(_WHITE, _BLACK);
 
-    for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {
-        display->setCursor(mainInputPositions[i].x, mainInputPositions[i].y);
-        display->println(mainViewStrings[i]);
-    }
+        for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {
+            display->setCursor(mainInputPositions[i].x, mainInputPositions[i].y);
+            display->println(mainViewStrings[i]);
+        }
+    #elif(DISPLAY_TYPE == ST_7735)
+        for(uint8_t i = 0; i < MAIN_IO_COUNT; i++) {
+            display->drawButton(mainInputPositions[i].x, mainInputPositions[i].y, mainViewStrings[i], SMALL);
+        }
+    #endif
 }

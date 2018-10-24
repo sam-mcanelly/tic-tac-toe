@@ -21,6 +21,12 @@
 
 void UTGraph::create(boolean show) {
     drawBoundaries();
+
+    #if(DISPLAY_TYPE == ST_7735)
+        drawParameterTray();
+        drawParameters();
+    #endif
+
     upper_bound = adjustment_parameters->_range;
 
     if(show)
@@ -54,22 +60,27 @@ void UTGraph::nextFrame(XYPos_t values[FRAME_POINT_COUNT]) {
         }
     #endif
 
+    //update current frame index in history buffer
     current_frame_idx += 1;
     if(current_frame_idx > FRAME_STORAGE_COUNT - 1) {
         current_frame_idx = 0;
     }
 
+    //fill history buffer with frames that were just received
     for(int i = 0; i < FRAME_POINT_COUNT; i++) {
         frames[current_frame_idx][i] = values[i];
     }
 
     checkButtonsWhileRunning();
-
     renderCurrentFrame();
 
-    // if the values need to be updated, do it
-    checkPots();
-    drawParameters();
+    if(inspecting) drawInspectionPointer();
+
+    // check potentiometers and draw parameters every other frame
+    if(current_frame_idx % 2 == 0) {
+        checkPots();
+        drawParameters();
+    }
 
     display->display();
 }
@@ -80,26 +91,37 @@ void UTGraph::renderCurrentFrame() {
     //draw fps
     #if(DEBUGGING_MODE == true)
         if(isRunning()) {
-            display->setCursor(95, 0);
-            display->setTextColor(WHITE, BLACK);
+            #if(DISPLAY_TYPE == SSD_1306)
+                display->setCursor(95, 0);
+            #elif(DISPLAY_TYPE == ST_7735)
+                display->setCursor(130, 0);
+            #endif
+            display->setTextColor(_WHITE, _BLACK);
             display->print(fps);
             display->print("fps");
         }
     #endif
 
-    float mult_const = 126.0 / (range - 1.0);
+    #if(DISPLAY_TYPE == SSD_1306)
+        float mult_const = 126.0 / (range - 1.0);
+    #elif(DISPLAY_TYPE == ST_7735)
+        float mult_const = 158.0 / (range - 1.0);
+    #endif
     float x_pos = 0.0;
 
     for(int i = 0; i < FRAME_POINT_COUNT; i++) {
         x_pos = (((frames[current_frame_idx][i].x / 10.0) - offset) - 1.0) * mult_const;
-        if(x_pos > 124 || x_pos < 2) continue;
+        if(x_pos > CANVAS_WIDTH || x_pos < 2) continue;
 
         if(inspecting && x_pos < inspect + 3 && x_pos > inspect - 3 ) {
             inspect_x = frames[current_frame_idx][i].x / 10.0;
             inspect_y = frames[current_frame_idx][i].y;
         }
 
-        display->drawFastVLine(x_pos+1, 51 - frames[current_frame_idx][i].y, frames[current_frame_idx][i].y, WHITE);
+        display->drawFastVLine(x_pos+1, 
+                               CANVAS_HEIGHT - frames[current_frame_idx][i].y,
+                               frames[current_frame_idx][i].y,
+                               _WHITE);
     }
 }
 
@@ -164,6 +186,7 @@ void UTGraph::runDemo() {
     XYPos_t demo_frames[FRAME_POINT_COUNT];
 
     drawParameterTray();
+    ping->startReading();
 
     // Mocks UTPing's functionality
     while(running) {
@@ -178,7 +201,7 @@ void UTGraph::runDemo() {
             demo_frames[i].x = i*10.0;
             demo_frames[i].y = uint16_t(exp(-(i/50.0))*(sin(i) + 1.0) * 20.0) * gain + random(2);//(uint16_t)((sin(i) + 1) * (gain * 10) + random(2));
         }
-        delay(20);
+        delay(10);
 
         #if(DEBUGGING_MODE == true)
             //unsigned long frame_gen_time = millis() - start_millis;
@@ -186,11 +209,12 @@ void UTGraph::runDemo() {
             //Serial.print(frame_gen_time);
             //Serial.println("ms");
         #endif
-        
-        nextFrame(demo_frames);
 
-        ping->readSignal();
+        //ping->readSignal(demo_frames);
+        nextFrame(demo_frames);
     }
+
+    ping->stopReading();
 }
 
 //not finished
@@ -247,7 +271,11 @@ void UTGraph::checkPots() {
     float new_gain = (gain_val - 1.0) * analog_common_factor * adjustment_parameters->_gain;
     float new_range = (1.0 - ((range_val - 1.0) * analog_common_factor)) * adjustment_parameters->_range;
     float new_offset = (offset_val - 1.0) * analog_common_factor *  ((adjustment_parameters->_range - new_range)*100);
-    float new_inspect = (inspect_val - 1.0) * analog_common_factor * 124 + 2;
+    #if(DISPLAY_TYPE == SSD_1306)
+        float new_inspect = (inspect_val - 1.0) * analog_common_factor * 124 + 2;
+    #elif(DISPLAY_TYPE == ST_7735)
+        float new_inspect = (inspect_val - 1.0) * analog_common_factor * 156 + 2;
+    #endif
 
     gain = new_gain < 0.0 ? 0.0 : new_gain; 
     range = new_range * 100; //use centimeters here
@@ -268,57 +296,117 @@ view_t UTGraph::enterPress() {
 }
 
 void UTGraph::drawBoundaries() {
-    display->drawFastVLine(0, 1, 50, WHITE);
-    display->drawFastHLine(0, 50, 127, WHITE);
+    display->drawFastVLine(canvas_data[0].y, canvas_data[0].x, canvas_data[1].y, _WHITE);
+    display->drawFastHLine(canvas_data[0].y, canvas_data[1].y, canvas_data[1].x, _WHITE);
 }
 
 void UTGraph::clearGraph() {
     display->fillRect(canvas_data[0].x, canvas_data[0].y, 
-                      canvas_data[1].x, canvas_data[1].y, BLACK); //clear old data
+                      canvas_data[1].x, canvas_data[1].y, _BLACK); //clear old data
 }
 
-//move this to UTTray
+//update this for the new display and make it more generic
 void UTGraph::drawParameterTray() {
-    display->fillRect(1, 53, 126, 10, BLACK);
-    display->drawFastVLine(38, 50, 14, WHITE);
-    display->drawFastVLine(83, 50, 14, WHITE);
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->fillRect(1, 53, 126, 10, _BLACK);
+        display->drawFastVLine(38, 50, 14, _WHITE);
+        display->drawFastVLine(83, 50, 14, _WHITE);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->drawFastHLine(0, 82, 160, _WHITE);
+        display->setTextColor(_YELLOW);
+
+        //draw top line parameter names
+        display->setCursor(1, distance_position.y);
+        display->print("Distance:");
+
+        display->setCursor(102, magnitude_position.y);
+        display->print("Mag:");
+
+        display->setTextColor(_MAGENTA);
+
+        //draw bottom parameter names
+        display->setCursor(1, gain_position.y);
+        display->print("Gain:");
+
+        display->setCursor(1, range_position.y);
+        display->print("Window width:");
+
+        display->setCursor(1, offset_position.y);
+        display->print("X offset:");
+
+        display->drawFastHLine(0, 112, 160, _WHITE);
+    #endif
 }
 
-void UTGraph::drawParameters() {
-    char print_val[MEASURMENT_VALUE_LENGTH + 1];
+//update this for the new display
+#if(DISPLAY_TYPE == SSD_1306)
+    void UTGraph::drawParameters() {
+        char print_val[MEASURMENT_VALUE_LENGTH + 1];
 
-    display->setCursor(gain_position.x, gain_position.y);
-    display->setTextColor(WHITE, BLACK);
-    sprintf(print_val, "%4.2fdB", gain);
-    display->println(print_val);
-    
-    /**
-     * The bottom two right parameters are 
-     * different based on the mode
-     * */
-
-    display->setCursor(distance_range_position.x, distance_range_position.y);
-    if(inspecting) {
-        formatDisplayStringMetric(print_val, inspect_x);
+        display->setCursor(gain_position.x, gain_position.y);
+        display->setTextColor(_WHITE, _BLACK);
+        sprintf(print_val, "%4.2fdB", gain);
         display->println(print_val);
-        drawInspectionPointer();
-    } else {
+        
+        /**
+         * The bottom two right parameters are 
+         * different based on the mode
+         * */
+
+        display->setCursor(distance_range_position.x, distance_range_position.y);
+        if(inspecting) {
+            formatDisplayStringMetric(print_val, inspect_x);
+            display->println(print_val);
+        } else {
+            formatDisplayStringMetric(print_val, range);
+            display->println(print_val);
+        }
+
+        display->setCursor(magnitude_offset_position.x, magnitude_offset_position.y);
+        if(inspecting) {
+            sprintf(print_val, "%7.2f", inspect_y);
+            display->println(print_val);
+        } else {
+            formatDisplayStringMetric(print_val, offset);
+            display->println(print_val);
+        }
+    }
+#elif(DISPLAY_TYPE == ST_7735)
+    void UTGraph::drawParameters() {
+        char print_val[MEASURMENT_VALUE_LENGTH + 1];
+
+        display->setCursor(gain_position.x, gain_position.y);
+        display->setTextColor(_WHITE, _BLACK);
+        sprintf(print_val, "%5.2fdB", gain);
+        display->println(print_val);
+        
+        /**
+         * The bottom two right parameters are 
+         * different based on the mode
+         * */
+
+        if(inspecting) {
+            display->setCursor(distance_position.x, distance_position.y);
+            formatDisplayStringMetric(print_val, inspect_x);
+            display->println(print_val);
+        }
+        display->setCursor(range_position.x, range_position.y);
         formatDisplayStringMetric(print_val, range);
         display->println(print_val);
-    }
 
-    display->setCursor(magnitude_offset_position.x, magnitude_offset_position.y);
-    if(inspecting) {
-        sprintf(print_val, "%7.2f", inspect_y);
-        display->println(print_val);
-    } else {
+        if(inspecting) {
+            display->setCursor(magnitude_position.x, magnitude_position.y);
+            sprintf(print_val, "%5.1f", inspect_y);
+            display->println(print_val);
+        }
+        display->setCursor(offset_position.x, offset_position.y);
         formatDisplayStringMetric(print_val, offset);
         display->println(print_val);
     }
-}
+#endif
 
 void UTGraph::drawInspectionPointer() {
-    display->fillTriangle(inspect, 5, inspect - 2, 1, inspect + 2, 1, WHITE);
+    display->fillTriangle(inspect, 5, inspect - 2, 1, inspect + 2, 1, _YELLOW);
 }
 
 //helper function

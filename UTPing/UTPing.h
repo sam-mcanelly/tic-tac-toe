@@ -17,6 +17,13 @@ class UTPing
       propogation_offset = _prop_offset;
 
       adc = new ADC();
+
+      pinMode(A10, INPUT);
+      pinMode(A11, INPUT);
+
+      adc->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED_16BITS, ADC_1);
+      adc->setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);
+      adc->enableCompare(adc->getMaxValue(ADC_1), 0, ADC_1);
     }
 
     UTPing(int _output_pin, int _input_pin, long _prop_offset, double _mm) {
@@ -40,8 +47,11 @@ class UTPing
     //FRAME_POINT_COUNT
     void getNextFrame(XYPos_t *frame_buffer);
 
+    void startReading();
+    void stopReading();
+
     //function for testing
-    void readSignal();
+    void readSignal(XYPos_t *frame_buffer);
 
 
     

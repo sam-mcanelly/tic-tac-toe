@@ -69,7 +69,8 @@ void UTAdjuster::changeCursorPosition(uint8_t new_position) {
     }
 
     display->setCursor(positions[*cursor_position].x, positions[*cursor_position].y);
-    display->setTextColor(WHITE, BLACK);
+    display->setTextColor(_WHITE, _BLACK);
+    //display->setTextColor(ST7735_WHITE, ST7735_BLACK);
     display->println(display_strings[*cursor_position]);
     *cursor_position = new_position;
 
@@ -90,7 +91,8 @@ void UTAdjuster::changeCursorPosition(uint8_t new_position) {
 void UTAdjuster::setCursor(XYPos_t position) {
     //sets cursor to draw, not input cursor
     display->setCursor(position.x, position.y);
-    display->setTextColor(BLACK, WHITE);
+
+    display->setTextColor(_BLACK, _WHITE);
 
     if(adjusting) {
         display->println(adjusterDigitStrings[digit_cursor_position]);
@@ -131,7 +133,9 @@ view_t UTAdjuster::upPress() {
         adjusting = true;
         //clear old cursor (this might need to be refactored)
         display->setCursor(adjusterInputPositions[input_cursor_position].x, adjusterInputPositions[input_cursor_position].y);
-        display->setTextColor(WHITE, BLACK);
+
+        display->setTextColor(_WHITE, _BLACK);
+
         display->println(adjusterViewStrings[input_cursor_position]);
         changeCursorPosition(digit_cursor_position);
     }
@@ -150,7 +154,7 @@ view_t UTAdjuster::enterPress() {
         adjusting = false;
         display->setTextSize(2);
         display->setCursor(adjusterDigitPositions[digit_cursor_position].x, adjusterDigitPositions[digit_cursor_position].y);
-        display->setTextColor(WHITE, BLACK);
+        display->setTextColor(_WHITE, _BLACK);
         display->println(adjusterDigitStrings[digit_cursor_position]);
         display->setTextSize(1);
         changeCursorPosition(input_cursor_position);
@@ -170,15 +174,15 @@ view_t UTAdjuster::enterPress() {
 
 void UTAdjuster::drawAdjusterContainer()
 {
-    display->fillRect(20, 2, 100, 40, BLACK);
-    display->drawRect(20, 2, 100, 40, WHITE);
-    display->fillRect(20, 2, 100, 5, WHITE);
+    display->fillRect(20, 2, 100, 40, _BLACK);
+    display->drawRect(20, 2, 100, 40, _WHITE);
+    display->fillRect(20, 2, 100, 5, _WHITE);
     display->display();
 }
 
 
 void UTAdjuster::drawAdjusterButtons() {
-    display->setTextColor(WHITE, BLACK);
+    display->setTextColor(_WHITE, _BLACK);
 
     for(uint8_t i = 0; i < ADJUSTMENT_STRING_COUNT; i++) {
         display->setCursor(adjusterInputPositions[i].x, adjusterInputPositions[i].y);
@@ -187,7 +191,7 @@ void UTAdjuster::drawAdjusterButtons() {
 }
 
 void UTAdjuster::drawAdjusterDigits() {
-    display->setTextColor(WHITE, BLACK);
+    display->setTextColor(_WHITE, _BLACK);
     display->setTextSize(2);
 
     display->setCursor(decimal_position.x, decimal_position.y);
@@ -261,7 +265,7 @@ void UTAdjuster::saveAdjustmentValue() {
     result /= 1000;
     *adjustment_value = result;
 
-    display->fillRect(24, 34, 4, 4, WHITE);
+    display->fillRect(24, 34, 4, 4, _WHITE);
     display->display();
     EEPROM.write(EEPROM_save_start, result);
 
@@ -272,6 +276,6 @@ void UTAdjuster::saveAdjustmentValue() {
     #endif
 
     delay(200);
-    display->fillRect(24, 34, 4, 4, BLACK);
+    display->fillRect(24, 34, 4, 4, _BLACK);
     display->display();
 }

@@ -39,8 +39,16 @@ void UTMenu::changeCursorPosition(uint8_t new_position) {
     if(new_position == MENU_IO_COUNT) new_position = 0;
     else if(new_position < 0) new_position = MENU_IO_COUNT - 1;
 
+    //unselect old position
     display->setCursor(menuInputPositions[input_cursor_position].x, menuInputPositions[input_cursor_position].y);
-    display->setTextColor(WHITE, BLACK);
+
+    //display specific color settings
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->setTextColor(_WHITE, _BLACK);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->setTextColor(_BLACK, _WHITE);
+    #endif
+    
     display->println(menuViewStrings[input_cursor_position]);
     input_cursor_position = new_position;
     setCursor(menuInputPositions[input_cursor_position]);
@@ -58,7 +66,14 @@ void UTMenu::changeCursorPosition(uint8_t new_position) {
 void UTMenu::setCursor(XYPos_t position) {
     //sets cursor to draw, not input cursor
     display->setCursor(position.x, position.y);
-    display->setTextColor(BLACK, WHITE);
+
+    //display specific color settings
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->setTextColor(_BLACK, _WHITE);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->setTextColor(_WHITE, _BLACK);
+    #endif
+
     display->println(menuViewStrings[input_cursor_position]);
 }
 
@@ -97,13 +112,25 @@ view_t UTMenu::enterPress() {
 
 void UTMenu::drawMenuContainer() {
     //create border for menu
-    display->fillRect(0, 10, 70, 42, BLACK);
-    display->drawRect(0, 10, 70, 42, WHITE); 
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->fillRect(0, 10, 70, 42, _BLACK);
+        display->drawRect(0, 10, 70, 42, _WHITE);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->setCursor(45, 5);
+        display->setTextColor(_RED, _BLACK);
+        display->print("Settings");
+        display->fillRect(45, 15, 70, 42, _WHITE);
+        display->drawRect(45, 15, 70, 42, _RED);
+    #endif 
 }
 
 
 void UTMenu::drawMenuButtons() {
-    display->setTextColor(WHITE, BLACK);
+    #if(DISPLAY_TYPE == SSD_1306)
+        display->setTextColor(_WHITE, _BLACK);
+    #elif(DISPLAY_TYPE == ST_7735)
+        display->setTextColor(_BLACK);
+    #endif
     
     for(uint8_t i = 0; i < MENU_IO_COUNT; i++) {
         display->setCursor(menuInputPositions[i].x, menuInputPositions[i].y);

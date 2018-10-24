@@ -14,13 +14,14 @@
 
 class UTAdjuster : public UTComponent {
     public:
-        UTAdjuster(Adafruit_SSD1306 *_display, 
+        UTAdjuster(UTDisplayWrapper<DISPLAY_TYPE_CLASS> *_display, 
                    float *val, 
                    uint8_t digits[ADJUSTMENT_VALUE_DIGIT_COUNT], 
                    String _units,
                    int _EEPROM_save_start){
 
             display = _display;
+
             adjustment_value = val;
             adjustment_value_digits = digits;
             EEPROM_save_start = _EEPROM_save_start;

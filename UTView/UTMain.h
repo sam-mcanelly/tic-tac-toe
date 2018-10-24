@@ -15,14 +15,14 @@
 
 class UTMain : public UTComponent {
     public:
-        UTMain(Adafruit_SSD1306 *_display, UTGraph *_graph){
+        UTMain(UTDisplayWrapper<DISPLAY_TYPE_CLASS> *_display, UTGraph *_graph){
             display = _display;
             graphActive = false;
             graph = _graph;
         }
 
         ~UTMain() override {
-            delete graph;
+            //delete graph;
         }
 
         void create(boolean show);
@@ -39,9 +39,15 @@ class UTMain : public UTComponent {
         boolean graphActive; //are we currently interfacing with the graph?
 
         //main screen input positions
-        XYPos_t menuPosition = {2, 53};
-        XYPos_t startPosition = {45, 53};
-        XYPos_t exportPosition = {89, 53};
+        #if(DISPLAY_TYPE == SSD_1306)
+            XYPos_t menuPosition = {2, 53};
+            XYPos_t startPosition = {45, 53};
+            XYPos_t exportPosition = {89, 53};
+        #elif(DISPLAY_TYPE == ST_7735)
+            XYPos_t menuPosition = {2, 115};
+            XYPos_t startPosition = {62, 115};
+            XYPos_t exportPosition = {120, 115};
+        #endif
 
         XYPos_t mainInputPositions[MAIN_IO_COUNT] = {menuPosition, startPosition, exportPosition};
 

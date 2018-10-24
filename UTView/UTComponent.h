@@ -12,11 +12,10 @@
 
 #include "Arduino.h"
 #include "UTTypes.h"
+#include "UTDisplayWrapper.h"
 
 #include <Wire.h>
 #include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
 class UTComponent 
 {
@@ -51,7 +50,7 @@ class UTComponent
         };
 
     protected:
-        Adafruit_SSD1306 *display;
+        UTDisplayWrapper<DISPLAY_TYPE_CLASS> * display;
 
         uint8_t input_cursor_position = 0;
 

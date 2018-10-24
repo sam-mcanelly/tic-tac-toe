@@ -11,15 +11,19 @@
 #define UTView_h
 
 #include "Arduino.h"
+#include "UTTypes.h"
 
 #include <EEPROM.h>
 #include <SPI.h>
 #include <Wire.h>
 
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#if(DISPLAY_TYPE == SSD_1306)
+    #include <Adafruit_SSD1306.h>
+#elif(DISPLAY_TYPE == ST_7735)
+    #include <Adafruit_ST7735.h>
+#endif
 
-#include "UTTypes.h"
 #include "UTMain.h"
 #include "UTGraph.h"
 #include "UTMenu.h"
@@ -35,6 +39,7 @@ class UTView
 
         ~UTView() {
             Serial.println("destructing view...");
+            delete display;
             delete graph;
             delete main;
             delete menu;
@@ -53,6 +58,8 @@ class UTView
         uint8_t active_component_idx;
 
         adjustment_params_t adjustment_parameters;
+
+        UTDisplayWrapper<DISPLAY_TYPE_CLASS> *display;
         
         UTMain *main;
         UTGraph *graph;

@@ -9,26 +9,31 @@
 
 #include "UTView.h"
 
-Adafruit_SSD1306 display(OLED_RESET);
+#if(DISPLAY_TYPE == SSD_1306)
+    Adafruit_SSD1306 _display(OLED_RESET);
+#elif(DISPLAY_TYPE == ST_7735)
+    Adafruit_ST7735 _display(_CS, _A0, _SDA, _SCL, _RST);
+#endif
 
 void UTView::begin() {
-    display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
-    showSplashScreen();
+    display = new UTDisplayWrapper<DISPLAY_TYPE_CLASS>(&_display);
+    display->begin();
+    //showSplashScreen();
 
-    graph = new UTGraph(&display, &adjustment_parameters);
-    main = new UTMain(&display, graph);
-    menu = new UTMenu(&display);
-    delay_adjuster = new UTAdjuster(&display,
+    graph = new UTGraph(display, &adjustment_parameters);
+    main = new UTMain(display, graph);
+    menu = new UTMenu(display);
+    delay_adjuster = new UTAdjuster(display,
                                     &adjustment_parameters._delay,
                                     adjustment_parameters._delay_digits,
                                     micro_seconds,
                                     DELAY_EEPROM_START);
-    gain_adjuster = new UTAdjuster(&display,
+    gain_adjuster = new UTAdjuster(display,
                                     &adjustment_parameters._gain,
                                     adjustment_parameters._gain_digits,
                                     decibal,
                                     GAIN_EEPROM_START);
-    range_adjuster = new UTAdjuster(&display,
+    range_adjuster = new UTAdjuster(display,
                                     &adjustment_parameters._range,
                                     adjustment_parameters._range_digits,
                                     meters,
@@ -91,19 +96,19 @@ void UTView::populateAdjustmentParams() {
 }
 
 void UTView::showSplashScreen() {
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(20,24);
-    display.println("Ultrasonic Flaw");
-    display.println("    Detector v0.1");
-    display.display(); // show splashscreen
+    display->clearDisplay();
+    display->setTextSize(1);
+    display->setTextColor(_WHITE);
+    display->setCursor(20,24);
+    display->println("Ultrasonic Flaw");
+    display->println("    Detector v0.1");
+    display->display(); // show splashscreen
     delay(1000);
-    display.startscrollleft(0x00, 0x0F);
+    display->startscrollleft(0x00, 0x0F);
     delay(2000);
-    display.stopscroll();
-    display.clearDisplay();   // clears the screen and buffer
-    display.display();
+    display->stopscroll();
+    display->clearDisplay();   // clears the screen and buffer
+    display->display();
 }
 
 void UTView::addView(UTComponent *new_view) {
@@ -152,14 +157,14 @@ void UTView::exitToMainView() {
 }
 
 void UTView::redrawAll() {
-    display.clearDisplay();
-    display.setTextSize(1);
+    display->clearDisplay();
+    display->setTextSize(1);
     for(uint8_t i = 0; i <= active_component_idx; i++) {
         if(i == 0)
             main->showGraph();
         view_components[i]->create(false);
     }
-    display.display();
+    display->display();
 }
 
 
